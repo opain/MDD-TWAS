@@ -1,0 +1,44 @@
+---
+title: "MDD-TWAS"
+output: 
+  html_document:
+    toc: true
+    theme: united
+---
+
+***
+
+Welcome!
+
+This website will provide details of a project inferring differential gene expression in Major Depression based on GWAS summary statistics and summary-level gene expression data, an approach called Transcriptome-wide Association Study (TWAS).
+
+***
+
+#### Contents:
+
+* [Dall'Aglio, Lewis, Pain: Delineating the Genetic Component of Gene Expression in Major Depression](https://opain.github.io/MDD-TWAS/MDD-TWAS.html)
+
+***
+
+Please contact Oliver Pain (oliver.pain@kcl.ac.uk) to if you have any questions or comments.
+
+***
+
+I would like to thank the following people who have contributed to this project so far:
+
+* Cathryn Lewis
+* Lorenza Dall'Aglio
+
+***
+
+#### Funding:
+
+This work is funded by the MRC (MR/N015746/1), and the National Institute for Health Research (NIHR) Biomedical Research Centre at South London and Maudsley NHS Foundation Trust and King’s College London. The authors acknowledge use of the research computing facility at King’s College London, Rosalind (https://rosalind.kcl.ac.uk), which is delivered in partnership with the NIHR Maudsley BRC, and part-funded by capital equipment grants from the Maudsley Charity (award 980) and Guy’s & St. Thomas’ Charity (TR130505). The views expressed are those of the authors and not necessarily those of the NHS, the NIHR or the Department of Health and Social Care. 
+
+***
+
+#### Change log:
+
+**20/07/2020**:
+
+* Change log started
