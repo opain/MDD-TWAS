@@ -1572,7 +1572,7 @@ write.csv(focus,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TW
 </details>
 
 <details><summary>Show FOCUS results</summary>
-```{R, echo=F, eval=T}
+```{R, echo=F, eval=F}
 res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv')
 
 res<-res[order(res$chrom,res$tx_start),]
@@ -1589,7 +1589,7 @@ kable(res, rownames = FALSE, caption='FOCUS MDD Results', digits = 32)
 </details>
 
 <details><summary>Show FOCUS and other combined results</summary>
-```{R, echo=F, eval=T}
+```{R, echo=F, eval=F}
 res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_sig_FOCUS_results.csv')
 
 library(knitr)

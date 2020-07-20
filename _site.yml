@@ -1,0 +1,7 @@
+name: "MDD-TWAS"
+output_dir: "."
+navbar:
+  title: "MDD-TWAS"
+  right:
+    - icon: fa-github fa-lg
+      href: https://github.com/opain/MDD-TWAS
