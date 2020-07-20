@@ -11,4 +11,4 @@ git add .
 git add -u
 git status
 git commit -m 'Update'
-git push
+git push origin dev
