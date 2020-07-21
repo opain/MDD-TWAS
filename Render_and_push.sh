@@ -10,5 +10,5 @@ Rscript -e "rmarkdown::render_site()"
 git add .
 git add -u
 git status
-git commit -m 'Update'
+git commit -m ${1}
 git push origin dev
