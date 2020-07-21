@@ -1434,7 +1434,6 @@ EOF
 ```
 </details>
 
-
 <details><summary>Create FOCUS database for MDD TWAS</summary>
 ```{bash,echo=T, eval=F}
 # Merging the databases causes some strange warnings
@@ -1464,7 +1463,7 @@ sbatch -p brc,shared --mem=10G /mnt/lustre/groups/biomarkers-brc-mh/TWAS_resourc
 ########
 
 # Use a threshold that will run FOCUS for all TWAS significant loci (max GWAS.P = 5e-6)
-for chr in $(seq 22 22); do
+for chr in $(seq 1 22); do
 sbatch -p brc,shared --mem=10G /users/k1806347/brc_scratch/Software/focus.sh finemap /users/k1806347/brc_scratch/Data/GWAS_sumstats/Lorenza/DEPR01.focus.sumstats.gz  /scratch/groups/biomarkers-brc-mh/Reference_data/1KG_Phase3/PLINK/EUR/EUR_phase3.MAF_001.chr${chr} /mnt/lustre/groups/biomarkers-brc-mh/TWAS_resource/FOCUS/MDD_TWAS_db/MDD_TWAS.db --chr ${chr} --p-threshold 5e-6 --plot --out /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD.FOCUS.MDD_TWAS_db.chr${chr}
 done
 
@@ -1484,6 +1483,11 @@ for(i in focus.files){
 focus<-rbind(focus,fread(paste0('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/',i)))
 }
 
+# Update the feature IDs with gene names
+pos<-fread('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/MDD_TWAS.pos')
+focus<-merge(focus, pos[,c('WGT','ID')], by.x='mol_name', by.y='WGT',all.x=T)
+focus<-focus[order(focus$chrom, focus$region, 1-focus$pip),]
+
 # I noticed a bug in the output where features that should be in the 90% credible set are not
 focus_bug<-NULL
 for(i in unique(focus$region)){
@@ -1495,12 +1499,11 @@ for(i in unique(focus$region)){
 }
 
 # This shows several features should be in the credible set
-focus$in_cred_set[focus$ens_gene_id == 'DENND1B' & focus$tissue == 'cmc.brain.rnaseq' & focus$region == '1:197311514-1:199239815'] <- 1
-focus$in_cred_set[focus$ens_gene_id == 'OLFM4' & focus$tissue == 'cmc.brain.rnaseq' & focus$region == '13:53339645-13:54682393'] <- 1
-focus$in_cred_set[focus$ens_gene_id == 'ENSG00000229267' & focus$tissue == 'pec_twas_weights' & focus$region == '2:214014511-2:215573795'] <- 1
-focus$in_cred_set[focus$ens_gene_id == 'COQ3' & focus$tissue == 'cmc.brain.rnaseq_splicing' & focus$region == '6:97842747-6:100629728'] <- 1
-focus$in_cred_set[focus$ens_gene_id == 'OSBPL3' & focus$tissue == 'pituitary' & focus$region == '7:23471523-7:25077097'] <- 1
-focus$in_cred_set[focus$ens_gene_id == 'PXDNL' & focus$tissue == 'cmc.brain.rnaseq' & focus$region == '8:50082470-8:53302930'] <- 1
+focus$in_cred_set[focus$ID == 'OLFM4' & focus$tissue == 'cmc.brain.rnaseq' & focus$region == '13:53339645-13:54682393'] <- 1
+focus$in_cred_set[focus$ID == 'ENSG00000229267' & focus$tissue == 'pec_twas_weights' & focus$region == '2:214014511-2:215573795'] <- 1
+focus$in_cred_set[focus$ID == 'COQ3' & focus$tissue == 'cmc.brain.rnaseq_splicing' & focus$region == '6:97842747-6:100629728'] <- 1
+focus$in_cred_set[focus$ID == 'OSBPL3' & focus$tissue == 'pituitary' & focus$region == '7:23471523-7:25077097'] <- 1
+focus$in_cred_set[focus$ID == 'PXDNL' & focus$tissue == 'cmc.brain.rnaseq' & focus$region == '8:50082470-8:53302930'] <- 1
 
 # Update tissue for psychencode features
 focus_psychencode<-focus[focus$tissue == 'pec_twas_weights',]
@@ -1513,16 +1516,15 @@ ensembl = useEnsembl(biomart="ensembl", dataset="hsapiens_gene_ensembl", GRCh=37
 listAttributes(ensembl)
 Genes<-getBM(attributes=c('ensembl_gene_id','external_gene_name'), mart = ensembl)
 
-focus_psychencode<-merge(focus_psychencode, Genes, by.x='mol_name', by.y='ensembl_gene_id')
-focus_psychencode$mol_name<-focus_psychencode$external_gene_name
+focus_psychencode<-merge(focus_psychencode, Genes, by.x='ID', by.y='ensembl_gene_id')
+focus_psychencode$ID<-focus_psychencode$external_gene_name
 focus_psychencode$external_gene_name<-NULL
 focus_psychencode<-focus_psychencode[,names(focus),with=F]
 focus<-rbind(focus_fusion,focus_psychencode)
 
-fusion$tissue<-tolower(fusion$PANEL)
-fusion_focus<-merge(fusion, focus[,c('mol_name','tissue','twas_z','pip','in_cred_set','region'),with=F], by.x=c('tissue','ID'), by.y=c('tissue','mol_name'), all.x=T)
-fusion_focus<-fusion_focus[,c('CHR','P0','P1','PANEL_clean_short','ID','TWAS.Z','TWAS.P','twas_z','in_cred_set','pip','region'),with=F]
-names(fusion_focus)<-c('CHR','P0','P1','SNP-weight Set','ID','TWAS.Z','TWAS.P','FOCUS_twas_z','FOCUS_in_cred_set','FOCUS_pip','FOCUS_region')
+fusion_focus<-merge(fusion, focus[,c('mol_name','tissue','twas_z','pip','in_cred_set','region'),with=F], by.x=c('WGT'), by.y=c('mol_name'), all.x=T)
+fusion_focus<-fusion_focus[,c('WGT','CHR','P0','P1','PANEL_clean_short','ID','TWAS.Z','TWAS.P','twas_z','in_cred_set','pip','region'),with=F]
+names(fusion_focus)<-c('WGT','CHR','P0','P1','SNP-weight Set','ID','TWAS.Z','TWAS.P','FOCUS_twas_z','FOCUS_in_cred_set','FOCUS_pip','FOCUS_region')
 fusion_focus<-fusion_focus[order(fusion_focus$CHR, fusion_focus$P0),]
 fusion_focus$Location<-paste0('chr',fusion_focus$CHR,':',fusion_focus$P0,'-',fusion_focus$P1)   
 fusion_focus<-fusion_focus[,c('Location','SNP-weight Set','ID','TWAS.Z','TWAS.P','FOCUS_twas_z','FOCUS_in_cred_set','FOCUS_pip','FOCUS_region'),with=F]
@@ -1540,8 +1542,7 @@ library(data.table)
 focus<-fread('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv')
 fusion<-fread('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Conditional/MDD_TWAS_Conditional_table_novelty.csv')
 
-fusion$tissue<-tolower(fusion$PANEL)
-fusion_focus<-merge(fusion, focus[,c('mol_name','tissue','twas_z','pip','in_cred_set','region'),with=F], by.x=c('tissue','ID'), by.y=c('tissue','mol_name'), all.x=T)
+fusion_focus<-merge(fusion, focus[,c('mol_name','tissue','twas_z','pip','in_cred_set','region'),with=F], by.x=c('WGT'), by.y=c('mol_name'), all.x=T)
 
 fusion_focus<-fusion_focus[,c('WGT','CHR','P0','P1','PANEL_clean','ID','TWAS.Z','TWAS.P','Novel','Colocalised','in_cred_set','pip','region'),with=F]
 names(fusion_focus)<-c('WGT','CHR','P0','P1','SNP-weight Set','ID','TWAS.Z','TWAS.P','Novel','Colocalised','FOCUS_in_cred_set','FOCUS_pip','FOCUS_region')
@@ -1559,8 +1560,9 @@ fusion_focus_highConf<-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T & 
 # Subset transcriptom-wide significant that colocalised and pip > 0.5
 fusion_focus_TWsig<-fusion_focus_noMHC[fusion_focus_noMHC$TWAS.P < 1.368572e-06,]
 
-sum(duplicated(fusion_focus_TWsig$WGT))
-fusion_focus_TWsig[duplicated(fusion_focus_TWsig$WGT),]
+sum(duplicated(fusion_focus_TWsig$WGT)) # 2
+fusion_focus_TWsig[(fusion_focus_TWsig$WGT %in% fusion_focus_TWsig$WGT[duplicated(fusion_focus_TWsig$WGT)]),]
+# The FANCL feature is duplicated due to FOCUS defining two nearby regions of association. A splice variant of FANCL is in the credible set for one region but not the other.
 
 # Subset transcriptom-wide significant that colocalised and pip > 0.5
 fusion_focus_TWsig<-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T & fusion_focus_noMHC$FOCUS_pip > 0.5 & fusion_focus_noMHC$TWAS.P < 1.368572e-06,]
@@ -1571,25 +1573,8 @@ write.csv(focus,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TW
 ```
 </details>
 
-<details><summary>Show FOCUS results</summary>
-```{R, echo=F, eval=F}
-res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv')
-
-res<-res[order(res$chrom,res$tx_start),]
-res$region<-factor(res$region, levels=unique(res$region))
-res<-res[order(res$region,rev(res$pip)),]
-
-res<-res[c("chrom","tx_start","tx_stop","mol_name","tissue","twas_z","pip","in_cred_set","region")]
-names(res)<-c("CHR","P0","P1","ID","PANEL","TWAS.Z","PIP","In Credible Set","Region")
-
-library(knitr)
-kable(res, rownames = FALSE, caption='FOCUS MDD Results', digits = 32)
-```
-
-</details>
-
 <details><summary>Show FOCUS and other combined results</summary>
-```{R, echo=F, eval=F}
+```{R, echo=F, eval=T}
 res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_sig_FOCUS_results.csv')
 
 library(knitr)
@@ -2157,11 +2142,17 @@ cp /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS-GSEA/ByPanel/MDD_TWAS
 
 ***
 
-# Comparison with previous TWAS literature
+# Comparison with previous literature
+
+***
+
+## TWAS literature
 
 I need Lorenza to send me the results files whe prepared previously for this comparison. Alternatively, Lorenza could run this section. The below code has not been run or edited to work with new files yet.
 
-## Wray et al. (2018) and Gaspar et al. (2019)
+***
+
+### Wray et al. (2018) and Gaspar et al. (2019)
 
 <details><summary>Show code</summary>
 ```{R, eval=F, echo=T}
@@ -2361,9 +2352,13 @@ When comparing the Gaspar et al. (2019) results with our findings, it can be not
 
 </details>
 
+***
 
-# Comparison with the observed gene expression TWAS of depression 
-## Our finding compared to those from Jansen et al. (2016)
+## Observed gene expression TWAS of depression 
+
+***
+
+### Our finding compared to those from Jansen et al. (2016)
 
 <details><summary>Show code</summary>
 ```{R, eval=F, echo=T}
@@ -2480,7 +2475,9 @@ validated
 
 </details>
 
-### Jansen et al. (2016) findings compared to ours
+***
+
+#### Jansen et al. (2016) findings compared to ours
 
 <details><summary>Show code</summary>
 ```{R, eval=F, echo=T}
