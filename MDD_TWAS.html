@@ -17275,31 +17275,26 @@ dev.off()</code></pre>
 </div>
 <div id="comparison-with-previous-literature" class="section level1">
 <h1><span class="header-section-number">4</span> Comparison with previous literature</h1>
+<p>Lorenza has prepared results files of previous studies for this comparison.</p>
 <hr />
 <div id="twas-literature" class="section level2">
 <h2><span class="header-section-number">4.1</span> TWAS literature</h2>
-<p>I need Lorenza to send me the results files whe prepared previously for this comparison. Alternatively, Lorenza could run this section. The below code has not been run or edited to work with new files yet.</p>
-<hr />
-<div id="wray-et-al.-2018-and-gaspar-et-al.-2019" class="section level3">
-<h3><span class="header-section-number">4.1.1</span> Wray et al. (2018) and Gaspar et al. (2019)</h3>
 <details>
 <p><summary>Show code</summary></p>
 <pre class="r"><code>########################################
 # Comparing our results to previous TWASs
 ###############################################
 # our TWAS, Wray et al TWAS, Gaspar et al. TWAS
-
-rm(list=ls())
 ###
 # Load data
 ###
 library(data.table)
 #these are all files with significant features only. NB the Gaspar file includes findings from all snp weights from any 
 #gene sign. in at least one tissue
-our_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/AllTissues_CLEAN.txt&quot;)
-our_hits_sign &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/signtest.AllTissues_CLEAN.txt&quot;)
-Gaspar_hits &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/mock data/Gaspar et al. hits.txt&quot;)
-Wray_hits &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/mock data/Wray et al. hits.csv&quot;)
+our_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_CLEAN.txt&quot;)
+our_hits_sign &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_TWSig_CLEAN.txt&quot;)
+Gaspar_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Gaspar\ et\ al.\ hits.csv&quot;)
+Wray_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Wray\ et\ al.\ hits.csv&quot;)
 
 ###
 # Structure df so that they are similar
@@ -17360,30 +17355,35 @@ sign_genes_our &lt;- our_hits_sign$ID
 sign_genes_Wray &lt;- Wray_hits_filt$ID
 sign_genes_Gaspar &lt;- Gaspar_hits2$ID
 
-Gaspar &lt;- unique(sign_genes_Gaspar) #25 unique genes
-Wray &lt;- unique(sign_genes_Wray) #17 unique genes
-Us &lt;- unique(sign_genes_our) #91 unique genes 
+Gaspar &lt;- unique(sign_genes_Gaspar)
+length(Gaspar) #25 unique genes
+Wray &lt;- unique(sign_genes_Wray)
+length(Wray) #17 unique genes
+Us &lt;- unique(sign_genes_our)
+length(Us) #94 unique genes 
 
 #create a general variable with all sign. genes in any paper
 All &lt;- c(Gaspar, Wray, Us)
-All #133 features
+length(All) #136 features
 
 #keep only unique gene IDs
 All_unique &lt;- unique(All)
-All_unique #106 genes
+length(All_unique) #108 genes
 
 ###
 #Keep only genes sign, in either of the three studies
 ###
 
 #filter by genes which are in the vector containing sign. features in any of the studies
-our_hits_final &lt;- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  #629 observations
+our_hits_final &lt;- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  
+dim(our_hits_final)[1] #675 observations
 
 #keep only unique genes in our study (those with the greatest absolute z-score)
 our_hits_final&lt;-our_hits_final[!is.na(our_hits_final$TWAS.Z),]
 our_hits_final2 &lt;- our_hits_final[order(abs(our_hits_final$TWAS.Z), decreasing = T), ]
 library(dplyr)
-our_hits_final3  &lt;- our_hits_final2 %&gt;% distinct(ID, .keep_all = T) #102 obs.
+our_hits_final3  &lt;- our_hits_final2 %&gt;% distinct(ID, .keep_all = T)
+dim(our_hits_final3)[1] #107 obs.
 
 our_hits_correct &lt;- our_hits_final3
 
@@ -17391,7 +17391,8 @@ our_hits_correct &lt;- our_hits_final3
 Gaspar_hits2b&lt;-Gaspar_hits2[!is.na(Gaspar_hits2$TWAS.Z),]
 Gaspar_hits3 &lt;- Gaspar_hits2b[order(abs(Gaspar_hits2b$TWAS.Z), decreasing = T), ]
 library(dplyr)
-Gaspar_hits4  &lt;- Gaspar_hits3 %&gt;% distinct(ID, .keep_all = T) #25 gene IDs, as expected 
+Gaspar_hits4  &lt;- Gaspar_hits3 %&gt;% distinct(ID, .keep_all = T)
+dim(Gaspar_hits4)[1] #25 gene IDs 
 
 Gaspar_correct &lt;- Gaspar_hits4
 
@@ -17421,11 +17422,9 @@ our_hits_correct$TWAS.P &lt;- NULL
 our_hits_correct$PANEL &lt;- NULL
 our_hits_correct$PANEL_clean_short &lt;- NULL
 
-
 Wray_hits_correct$CHR &lt;- NULL
 Wray_hits_correct$Wray_TWAS.P &lt;- NULL
 Wray_hits_correct$TWAS.P &lt;- NULL
-
 
 Gaspar_correct$CHR &lt;- NULL
 Gaspar_correct$PANEL &lt;- NULL
@@ -17439,11 +17438,12 @@ Gaspar_correct &lt;- as_tibble(Gaspar_correct) #transform all df into tibbles to
 ##df are already tibbles. this was the only one left to convert
 
 #join hits bw Gaspar and our study
-table_correct&lt;- full_join(our_hits_correct, Gaspar_correct) #dim 106, 7
+table_correct&lt;- full_join(our_hits_correct, Gaspar_correct)
+dim(table_correct)[1] # 108
 
 #merge the newly created table with the wray et al findings too
-table_correct2 &lt;- full_join(table_correct, Wray_hits_correct)  #dim 106, 8 
-
+table_correct2 &lt;- full_join(table_correct, Wray_hits_correct)  #dim 108, 8 
+dim(table_correct2)[1] # 108
 
 #check that no gene is repeated and that z-scores are present for the three studies (should be high z-scores)
 table_correct2 &lt;- table_correct2[order(table_correct2$ID), ]
@@ -17453,7 +17453,7 @@ table_correct2 #everything looks fine
 table_correct2$DallAglio_TWAS.P &lt;- NULL
 
 #add a column saying whether the gene was transcriptome-wide sign. in our study 
-table_correct2$Transcriptome_wide_sign_DallAglio &lt;- ifelse(table_correct2$DallAglio_TWAS.Z &gt; 4.74 | table_correct2$DallAglio_TWAS.Z &lt; -4.74, &quot;Sign.&quot;, &quot;Not Sign.&quot;)
+table_correct2$Transcriptome_wide_sign_DallAglio &lt;- ifelse(table_correct2$DallAglio_TWAS.Z &gt; 4.83 | table_correct2$DallAglio_TWAS.Z &lt; -4.83, &quot;Sign.&quot;, &quot;Not Sign.&quot;)
 
 ###
 # Clean up and save
@@ -17468,21 +17468,788 @@ my_data2
 
 
 #save as csv file (each df col is treated as independent col, +excel format)
-write.csv(my_data2, &#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Output/table/comparison_previousTWASs.csv&#39;, row.names=F)
+write.csv(my_data2, &#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/comparison_previousTWASs.csv&#39;, row.names=F)
 my_data2</code></pre>
-<p><strong>Findings</strong> When comparing the Wray et al. (2018) results from the CMC DLPFC with our findings, we can observe that we obtained identical results in terms of TWAS z-values. This is true also for two genes which do not show concordance in effect size: SLC25A17 and DENND1B. This is due to us findings stronger associations in those genes in panels which were not tested by the Wray et al study (i.e. the nucleus accumbens and the CMC DLPFC splicing). Generally, Wray et al. (2018) identified a greater number of associations, but this was due to the lower multiple testing burden they presented as opposed to our study which tested 20 SNP-weight sets instead of one.</p>
-<p>When comparing the Gaspar et al. (2019) results with our findings, it can be noted that results were generally very similar. Inconsistencies were present in four genes (DENND1B, KLC1, ZMYND8, ZNF165), where different directions of effect were identified. This is due to (i) the association being the strongest in our study within the CMC DLPFC splicing panel (where inconsistent direction of effects are generally present), (ii) our finding being from a SNP-weight panel not tested in the Gaspar et al. study (e.g. KLC1 z-score = -4.7 for the thyroid and ZNF165 z-score = 4.18 for the thyroid tissue), (iii) the Gaspar et al. study testing SNP-weight panels we did not test (e.g. for ZMYND8, a high z-score was found by them in the DGN whole blood panel). Interestingly, four associations within genes which were not tested in our study due to their low heritability in the tested SNP-weights were instead identified by the Gaspar study, namely BTN1A1, HIST1H2AK, TMEM33, TMX2.These were the strongest and significant in the DGN blood weight set (for BTN1A1, HIST1H2AK and TMX2), and in the GTEx cerebellum SNPweight set for TMEM33. The latter is of high interest since the same SNP-weight was tested in our study, but it could not surpass the heritability threshold for feature selection.</p>
+</details>
+<details>
+<p><summary>Show comparison with previous TWAS</summary></p>
+<table>
+<caption>Comparison with previous TWAS</caption>
+<thead>
+<tr class="header">
+<th align="left">ID</th>
+<th align="right">Gaspar_TWAS.Z</th>
+<th align="right">Wray_TWAS.Z</th>
+<th align="right">DallAglio_TWAS.Z</th>
+<th align="left">Transcriptome_wide_sign_DallAglio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AL049840.1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.143620</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ANKRD44</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.690140</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">AP000662.4</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-4.980256</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">AREL1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.015110</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">BAG5</td>
+<td align="right">5.24</td>
+<td align="right">NA</td>
+<td align="right">4.630780</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">BAG6</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.580000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">BEND4</td>
+<td align="right">NA</td>
+<td align="right">-4.64</td>
+<td align="right">-4.645980</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">BTN1A1</td>
+<td align="right">-5.91</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">BTN3A2</td>
+<td align="right">5.38</td>
+<td align="right">NA</td>
+<td align="right">5.898930</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">BVES-AS1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.578300</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">CACNA1E</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-4.989390</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">CCDC175</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.478850</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">CKB</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.346000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">CLP1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.195860</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">COQ3</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.146560</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">CSE1L</td>
+<td align="right">NA</td>
+<td align="right">-4.71</td>
+<td align="right">-4.714000</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">CTC-467M3.3</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-7.091600</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">CTC-498M16.4</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.403610</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">CTD-2298J14.2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.678860</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">CTD-2653B5.1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.105730</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">DCAF4L1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.128000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">DDAH2</td>
+<td align="right">NA</td>
+<td align="right">5.34</td>
+<td align="right">5.409500</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">DDX27</td>
+<td align="right">NA</td>
+<td align="right">4.84</td>
+<td align="right">4.836260</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">DENND1B</td>
+<td align="right">NA</td>
+<td align="right">4.85</td>
+<td align="right">-5.421950</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">DLST</td>
+<td align="right">NA</td>
+<td align="right">4.98</td>
+<td align="right">5.089700</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">DNAJC24</td>
+<td align="right">NA</td>
+<td align="right">4.46</td>
+<td align="right">4.498630</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">DRD2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.073787</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">EP300</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.493900</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">ESR2</td>
+<td align="right">-5.43</td>
+<td align="right">NA</td>
+<td align="right">-5.982300</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">FANCL</td>
+<td align="right">NA</td>
+<td align="right">-5.18</td>
+<td align="right">-5.183180</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">FLOT1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.557400</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">HCP5</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">6.400800</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">HIST1H2AK</td>
+<td align="right">6.50</td>
+<td align="right">NA</td>
+<td align="right">-0.805100</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">HIST1H4D</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-4.987600</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">HIST1H4L</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4.870800</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">HMGN4</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.395400</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">JKAMP</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.125100</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">KLC1</td>
+<td align="right">5.34</td>
+<td align="right">NA</td>
+<td align="right">-4.714100</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">LIN28B</td>
+<td align="right">NA</td>
+<td align="right">-5.23</td>
+<td align="right">-5.232050</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">LRFN5</td>
+<td align="right">5.23</td>
+<td align="right">NA</td>
+<td align="right">5.597540</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">MFF</td>
+<td align="right">4.98</td>
+<td align="right">NA</td>
+<td align="right">4.601028</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">MICB</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.557000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">MYO18A</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.128570</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">NDUFA2</td>
+<td align="right">NA</td>
+<td align="right">5.19</td>
+<td align="right">5.190020</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">NEGR1</td>
+<td align="right">7.35</td>
+<td align="right">NA</td>
+<td align="right">8.760622</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">NKAPL</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.002860</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">OLFM4</td>
+<td align="right">NA</td>
+<td align="right">5.09</td>
+<td align="right">5.091290</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">OSBPL3</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.622890</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">PCDHA5</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.402970</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">PCDHA8</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-4.980100</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">PCMTD1</td>
+<td align="right">-5.38</td>
+<td align="right">NA</td>
+<td align="right">-4.612900</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">PGBD1</td>
+<td align="right">-5.80</td>
+<td align="right">NA</td>
+<td align="right">-6.313100</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">PIGFP2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.305600</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">PMFBP1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.160620</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">PPP1R18</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4.910200</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">PROX2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.758100</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">PRRC2A</td>
+<td align="right">6.29</td>
+<td align="right">NA</td>
+<td align="right">3.755600</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">PRSS16</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.916080</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">PXDNL</td>
+<td align="right">NA</td>
+<td align="right">5.89</td>
+<td align="right">5.887460</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RAB27B</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.012900</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RANGAP1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.575273</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RERE</td>
+<td align="right">-5.46</td>
+<td align="right">NA</td>
+<td align="right">-5.310078</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RFWD2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.039850</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RP1-153G14.4</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.354000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RP1-265C24.5</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.532000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RP11-163N6.2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.336530</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RP11-318C24.2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.027510</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RP11-600F24.2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.185660</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RP11-73M18.6</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.031320</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RP11-73M18.7</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4.856130</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RP11-73M18.8</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.142000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RP11-73M18.9</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4.977330</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RP11-814H16.2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.009600</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RP11-894P9.2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.462560</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RP5-1115A15.1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.175240</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RP5-874C20.3</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.739000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RPL31P12</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-7.785520</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">RPS6KL1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.023810</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">RTN1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.348450</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">SF3B1</td>
+<td align="right">NA</td>
+<td align="right">4.45</td>
+<td align="right">5.214900</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">SLC25A17</td>
+<td align="right">NA</td>
+<td align="right">-4.73</td>
+<td align="right">5.076990</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">SLC30A9</td>
+<td align="right">-5.46</td>
+<td align="right">NA</td>
+<td align="right">-5.774530</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">SNORA63</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4.848870</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">SYNE2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.609528</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">TIAF1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.361200</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">TMEM106B</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.790690</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">TMEM161B-AS1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">6.720000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">TMEM258</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.021730</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">TMEM33</td>
+<td align="right">5.16</td>
+<td align="right">NA</td>
+<td align="right">4.837418</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">TMX2</td>
+<td align="right">5.52</td>
+<td align="right">NA</td>
+<td align="right">-0.130340</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">TNKS1BP1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">4.922610</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">TRMT61A</td>
+<td align="right">NA</td>
+<td align="right">5.05</td>
+<td align="right">5.051300</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">VARS2</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">6.323130</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">WASF5P</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.156240</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">XPNPEP3</td>
+<td align="right">NA</td>
+<td align="right">5.11</td>
+<td align="right">5.110000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ZC3H7B</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">5.729100</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">ZKSCAN3</td>
+<td align="right">5.05</td>
+<td align="right">NA</td>
+<td align="right">6.093300</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ZKSCAN4</td>
+<td align="right">-6.08</td>
+<td align="right">NA</td>
+<td align="right">-3.889300</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">ZMYND8</td>
+<td align="right">4.95</td>
+<td align="right">NA</td>
+<td align="right">-0.204800</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ZNF165</td>
+<td align="right">-4.96</td>
+<td align="right">NA</td>
+<td align="right">4.186300</td>
+<td align="left">Not Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">ZNF184</td>
+<td align="right">-5.19</td>
+<td align="right">NA</td>
+<td align="right">-6.325200</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ZNF204P</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">-5.032700</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">ZNF445</td>
+<td align="right">NA</td>
+<td align="right">-5.11</td>
+<td align="right">-5.103280</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ZSCAN12P1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">6.268010</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">ZSCAN16</td>
+<td align="right">-5.47</td>
+<td align="right">NA</td>
+<td align="right">-6.109000</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ZSCAN23</td>
+<td align="right">-5.66</td>
+<td align="right">NA</td>
+<td align="right">-5.777500</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="odd">
+<td align="left">ZSCAN31</td>
+<td align="right">-5.59</td>
+<td align="right">NA</td>
+<td align="right">-5.084150</td>
+<td align="left">Sign.</td>
+</tr>
+<tr class="even">
+<td align="left">ZSCAN9</td>
+<td align="right">-5.14</td>
+<td align="right">NA</td>
+<td align="right">-6.159020</td>
+<td align="left">Sign.</td>
+</tr>
+</tbody>
+</table>
 </details>
 <hr />
 </div>
-</div>
 <div id="observed-gene-expression-twas-of-depression" class="section level2">
 <h2><span class="header-section-number">4.2</span> Observed gene expression TWAS of depression</h2>
-<hr />
-<div id="our-finding-compared-to-those-from-jansen-et-al.-2016" class="section level3">
-<h3><span class="header-section-number">4.2.1</span> Our finding compared to those from Jansen et al. (2016)</h3>
 <details>
-<p><summary>Show code</summary></p>
+<p><summary>Our findings compared to Jansen et al. (2016)</summary></p>
 <pre class="r"><code>##################
 # Comparing our findings to the findings from Jansen et al. (TWAS of observed gene expression)
 ##################
@@ -17491,13 +18258,12 @@ my_data2</code></pre>
 # Load data
 ###
 
-rm(list=ls())
-
 library(data.table)
 library(dplyr)
-our_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/signtest.AllTissues_CLEAN.txt&quot;)
-Jansen_alloutput &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/mock data/Jansen et al. hits.csv&quot;)
-our_alloutput &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/AllTissues_CLEAN.txt&quot;)
+
+our_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_TWSig_CLEAN.txt&quot;)
+Jansen_alloutput &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Jansen\ et\ al.\ hits.csv&quot;)
+our_alloutput &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_CLEAN.txt&quot;)
 
 #filter for significant features only in the Jansen paper
 colnames(Jansen_alloutput)
@@ -17519,15 +18285,16 @@ Jansen_alloutput[order(Jansen_alloutput$Gene), ]
 table_ourvsJansen2 &lt;- merge(our_hits, Jansen_alloutput, by.x = &quot;ID&quot;, by.y = &quot;Gene&quot;)
 
 validated &lt;- table_ourvsJansen2[(table_ourvsJansen2$`P control vs current`&lt; 0.05), ]
-#42 features which were significant in our study, were also nominally significant in their study (for either one of the three comparison types)
+dim(validated)[1] # 44
+#44 features which were significant in our study, were also nominally significant in their study (for either one of the three comparison types)
 
 unique(validated$ID)
-#these 42 hits corresponded to 14 unique genes
-#[1] &quot;ANKRD44&quot;  &quot;CKB&quot;      &quot;COQ3&quot;     &quot;DLST&quot;     &quot;EP300&quot;    &quot;FLOT1&quot;    &quot;OSBPL3&quot;   &quot;PCDHA8&quot;   &quot;RAB27B&quot;  
-#[10] &quot;RERE&quot;     &quot;SYNE2&quot;    &quot;TMEM106B&quot; &quot;TRMT61A&quot;  &quot;ZSCAN16&quot; 
+#these 44 hits corresponded to 14 unique genes
+#[1] &quot;ANKRD44&quot;  &quot;CKB&quot;      &quot;COQ3&quot;     &quot;DLST&quot;     &quot;EP300&quot;    &quot;FLOT1&quot;
+#[7] &quot;OSBPL3&quot;   &quot;PCDHA8&quot;   &quot;RAB27B&quot;   &quot;RERE&quot;     &quot;SYNE2&quot;    &quot;TMEM106B&quot;
+#[13] &quot;TRMT61A&quot;  &quot;ZSCAN16&quot;
 
-nrow(validated)  #42 rows
-
+nrow(validated)  #44 rows
 
 ###
 #create a table comparing our findings to theirs
@@ -17571,12 +18338,13 @@ validated$Bonf_validated &lt;- ifelse(validated$Jansen_pvalue_controlsvscurrent 
 
 validated$Consistent_dir_effect &lt;- ifelse((validated$Jansen_zscore_controlsvscurrent &gt; 0 &amp; validated$DallAglio_Zscore &gt; 0) | (validated$Jansen_zscore_controlsvscurrent &lt; 0 &amp; validated$DallAglio_Zscore &lt;0), &quot;Yes&quot;, &quot;No&quot;)
 
-sum(validated$Consistent_dir_effect == &quot;Yes&quot;)  #17 associations present the same direction of effect
-sum(validated$Consistent_dir_effect == &quot;No&quot;) #25 associations present a different direction of effect
+sum(validated$Consistent_dir_effect == &quot;Yes&quot;)  #16 associations present the same direction of effect
+sum(validated$Consistent_dir_effect == &quot;No&quot;) #28 associations present a different direction of effect
 
 sum(validated$Bonf_validated == &quot;Yes&quot;) #12 associations Bonferroni validated
-print(validated$ID[validated$Bonf_validated == &quot;Yes&quot;]) # &quot;RERE&quot;     &quot;RERE&quot;     &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot;
-#&quot;TMEM106B&quot; &quot;EP300&quot;    &quot;EP300&quot; 
+print(validated$ID[validated$Bonf_validated == &quot;Yes&quot;]) 
+#[1] &quot;RERE&quot;     &quot;RERE&quot;     &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot;
+#[8] &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;TMEM106B&quot; &quot;EP300&quot;    &quot;EP300&quot;
 
 #these 12 validated associations come from 3 unique genes = RERE, TMEM106B, EP300
 
@@ -17586,18 +18354,13 @@ col_order_2 &lt;- c(&quot;Location&quot;, &quot;ID&quot;, &quot;PANEL_clean_shor
 validated &lt;- validated[, col_order_2]
 head(validated)
 
-
 #save as csv file (each df col is treated as independent col, +excel format)
-write.csv(validated, &#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Output/table/OurFindingsvsJansen_correct.csv&#39;, row.names = F)
+write.csv(validated, &#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/OurFindingsvsJansen_correct.csv&#39;, row.names = F)
 
 validated</code></pre>
-<p><em>Findings</em> When comparing our findings to those from Jansen et al. (2016) it can be observed that their results could validate 42 of our associations at a nominal p-value level and 12 at a Bonferroni significance level. Of these associations, 14 and 3 unique genes could be validated, respectively. The three Bonferroni validated genes include RERE, TMEM106B, EP300. However, for RERE, TMEM106B, inconsistent direction of effect was generally present. Contrarily, EP300 was consistently upregulated in both studies.</p>
 </details>
-<hr />
-<div id="jansen-et-al.-2016-findings-compared-to-ours" class="section level4">
-<h4><span class="header-section-number">4.2.1.1</span> Jansen et al. (2016) findings compared to ours</h4>
 <details>
-<p><summary>Show code</summary></p>
+<p><summary>Jansen et al. (2016) findings compared to ours</summary></p>
 <pre class="r"><code>####
 # Comparing the Jansen et al results to ours 
 ####
@@ -17611,12 +18374,16 @@ Jansen_sign[order(Jansen_sign$Gene), ]
 table_Jansenvsours &lt;- merge(our_alloutput, Jansen_sign, by.x = &quot;ID&quot;, by.y = &quot;Gene&quot;)
 
 Replicated_byus &lt;- table_Jansenvsours[(table_Jansenvsours$TWAS.P &lt; 0.05), ]
-#54 observations
+dim(Replicated_byus)[1]
+#66 observations
 
 unique(Replicated_byus$ID)
-#pertain to 28 IDs:  [1] &quot;AMICA1&quot;  &quot;ARHGEF7&quot; &quot;ARL4C&quot;   &quot;ASPH&quot;    &quot;CCDC116&quot; &quot;CD47&quot;    &quot;COA1&quot;    &quot;CPEB4&quot;   &quot;DDHD1&quot;   &quot;DENND4C&quot; &quot;FBXO3&quot;   &quot;GNPTAB&quot; 
-#[13] &quot;GOT2&quot;    &quot;IL6R&quot;    &quot;INVS&quot;    &quot;KTN1&quot;    &quot;MBNL1&quot;   &quot;MEFV&quot;    &quot;MTSS1&quot;   &quot;MYH9&quot;    &quot;NAPG&quot;    &quot;NCALD&quot;   &quot;NUPL2&quot;   &quot;OSTM1&quot;  
-#[25] &quot;PAPPA2&quot;  &quot;SP4&quot;     &quot;TMEM136&quot; &quot;TMEM64&quot;
+#pertain to 32 IDs:
+# [1] &quot;AMICA1&quot;  &quot;ARHGEF7&quot; &quot;ARL4C&quot;   &quot;ASPH&quot;    &quot;CCDC116&quot; &quot;CD47&quot;    &quot;COA1&quot;    &quot;CPEB4&quot;  
+# [9] &quot;DDHD1&quot;   &quot;DENND4C&quot; &quot;DYRK2&quot;   &quot;DYSF&quot;    &quot;FBXO3&quot;   &quot;GNPTAB&quot;  &quot;GOT2&quot;    &quot;IL6R&quot;   
+#[17] &quot;INVS&quot;    &quot;KTN1&quot;    &quot;MBNL1&quot;   &quot;MEFV&quot;    &quot;MTSS1&quot;   &quot;MYH9&quot;    &quot;NAPG&quot;    &quot;NCALD&quot;  
+#[25] &quot;NUPL2&quot;   &quot;OSTM1&quot;   &quot;PAPPA2&quot;  &quot;SP4&quot;     &quot;TGFBR3&quot;  &quot;TMED10&quot;  &quot;TMEM136&quot; &quot;TMEM64&quot;
+
 
 ###
 #FIx the table
@@ -17635,7 +18402,6 @@ Replicated_byus$P1 &lt;- as.numeric(as.character(Replicated_byus$P1))
 
 Replicated_byus &lt;- Replicated_byus[order(Replicated_byus$CHR, Replicated_byus$P0), ]
 
-
 #fix columns
 Replicated_byus$Location &lt;- paste0(&#39;chr&#39;,Replicated_byus$CHR,&#39;:&#39;, Replicated_byus$P0,&#39;-&#39;,Replicated_byus$P1)
 Replicated_byus$DallAglio_Zscore &lt;- Replicated_byus$TWAS.Z
@@ -17653,23 +18419,24 @@ Replicated_byus
 # of effects is consistent across the two studies
 
 #1) Add the column with surpassing the Bonferroni sign. or not
-0.05 / 28    #Bonf. significance = nominal p value / number of unique genes
-# = 0.001785714
+0.05 / 32    #Bonf. significance = nominal p value / number of unique genes
+# = 0.0015625
 
-Replicated_byus$Bonf_validated &lt;- ifelse(Replicated_byus$DallAglio_pvalue &lt; 0.001785714, &quot;Yes&quot;, &quot;No&quot;)
+Replicated_byus$Bonf_validated &lt;- ifelse(Replicated_byus$DallAglio_pvalue &lt; 0.0015625, &quot;Yes&quot;, &quot;No&quot;)
 
 #2) add the column specifying whether direction of effects is consistent
 
 Replicated_byus$Consistent_dir_effect &lt;- ifelse((Replicated_byus$Jansen_zscore_controlsvscurrent &gt; 0 &amp; Replicated_byus$DallAglio_Zscore &gt; 0) | (Replicated_byus$Jansen_zscore_controlsvscurrent &lt; 0 &amp; Replicated_byus$DallAglio_Zscore &lt;0), &quot;Yes&quot;, &quot;No&quot;)
 
-sum(Replicated_byus$Consistent_dir_effect == &quot;Yes&quot;)  #26 associations present the same direction of effect
-sum(Replicated_byus$Consistent_dir_effect == &quot;No&quot;) #28 associations present a different direction of effect
+sum(Replicated_byus$Consistent_dir_effect == &quot;Yes&quot;)  #33 associations present the same direction of effect
+sum(Replicated_byus$Consistent_dir_effect == &quot;No&quot;) #33 associations present a different direction of effect
 
-sum(Replicated_byus$Bonf_validated == &quot;Yes&quot;) #9 associations Bonferroni validated
+sum(Replicated_byus$Bonf_validated == &quot;Yes&quot;) #11 associations Bonferroni validated
 print(Replicated_byus$ID[Replicated_byus$Bonf_validated == &quot;Yes&quot;]) 
-# &quot;PAPPA2&quot; &quot;MBNL1&quot;  &quot;TMEM64&quot; &quot;TMEM64&quot; &quot;TMEM64&quot; &quot;TMEM64&quot; &quot;GNPTAB&quot; &quot;KTN1&quot;   &quot;KTN1&quot;
+#[1] &quot;PAPPA2&quot; &quot;MBNL1&quot;  &quot;TMEM64&quot; &quot;TMEM64&quot; &quot;TMEM64&quot; &quot;TMEM64&quot; &quot;GNPTAB&quot; &quot;KTN1&quot;   &quot;KTN1&quot;  
+#[10] &quot;KTN1&quot;   &quot;TMED10&quot;
 
-#these come from 5 unique genes = PAPPA2, MBNL1, TMEM64, GNPTAB, KTN1 
+#these come from 6 unique genes = PAPPA2, MBNL1, TMEM64, GNPTAB, KTN1, TMED10
 
 #change col order again
 col_order_3 &lt;- c(&quot;Location&quot;, &quot;ID&quot;, &quot;PANEL_clean_short&quot;, &quot;DallAglio_Zscore&quot;, &quot;Jansen_zscore_controlsvscurrent&quot;, &quot;DallAglio_pvalue&quot;, &quot;Jansen_pvalue_controlsvscurrent&quot;, &quot;Consistent_dir_effect&quot;, &quot;Bonf_validated&quot;)
@@ -17677,17 +18444,1262 @@ col_order_3 &lt;- c(&quot;Location&quot;, &quot;ID&quot;, &quot;PANEL_clean_shor
 Replicated_byus &lt;- Replicated_byus[, col_order_3]
 head(Replicated_byus)
 
-
 #save as csv file 
-write.csv(Replicated_byus, &#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Output/table/Jansenvsourfindings_correct.csv&#39;, row.names = F)
+write.csv(Replicated_byus, &#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Jansenvsourfindings_correct.csv&#39;, row.names = F)
 
 Replicated_byus</code></pre>
-<p><em>Findings</em> 54 associations in the Jansen et al. (2016) study were replicated by our findings at the nominal level in any tissue, while 9 at a Bonferroni significance threshold. Of these, 28 and 5 were from unique genes, respectively. Such unique genes are PAPPA2, MBNL1, TMEM64, GNPTAB, KTN1. Of note, half of the feature associations presented the same direction of effect.</p>
+</details>
+<details>
+<p><summary>Show comparison with Jansen et al.</summary></p>
+<table>
+<caption>Our Findings vs Jansen</caption>
+<thead>
+<tr class="header">
+<th align="left">Location</th>
+<th align="left">ID</th>
+<th align="left">PANEL_clean_short</th>
+<th align="right">DallAglio_Zscore</th>
+<th align="right">Jansen_zscore_controlsvscurrent</th>
+<th align="right">DallAglio_pvalue</th>
+<th align="right">Jansen_pvalue_controlsvscurrent</th>
+<th align="left">Consistent_dir_effect</th>
+<th align="left">Bonf_validated</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr1:8412457-8877702</td>
+<td align="left">RERE</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">-5.095707</td>
+<td align="right">0.194</td>
+<td align="right">3.47e-07</td>
+<td align="right">0.000998</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr1:8412457-8877702</td>
+<td align="left">RERE</td>
+<td align="left">YFS Blood</td>
+<td align="right">-5.310078</td>
+<td align="right">0.194</td>
+<td align="right">1.10e-07</td>
+<td align="right">0.000998</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2:197831741-198175897</td>
+<td align="left">ANKRD44</td>
+<td align="left">YFS Blood</td>
+<td align="right">-5.690140</td>
+<td align="right">-0.129</td>
+<td align="right">1.27e-08</td>
+<td align="right">0.036400</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr5:140220907-140223351</td>
+<td align="left">PCDHA8</td>
+<td align="left">GTEx Cerebellar Hemispher…</td>
+<td align="right">-4.980100</td>
+<td align="right">0.135</td>
+<td align="right">6.36e-07</td>
+<td align="right">0.027700</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:28092338-28097860</td>
+<td align="left">ZSCAN16</td>
+<td align="left">YFS Blood</td>
+<td align="right">-6.109000</td>
+<td align="right">-0.146</td>
+<td align="right">1.00e-09</td>
+<td align="right">0.016700</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:30695485-30710682</td>
+<td align="left">FLOT1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-5.299700</td>
+<td align="right">0.130</td>
+<td align="right">1.16e-07</td>
+<td align="right">0.030700</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:30695485-30710682</td>
+<td align="left">FLOT1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-5.299700</td>
+<td align="right">0.132</td>
+<td align="right">1.16e-07</td>
+<td align="right">0.031100</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:30695485-30710682</td>
+<td align="left">FLOT1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-5.067100</td>
+<td align="right">0.130</td>
+<td align="right">4.04e-07</td>
+<td align="right">0.030700</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:30695485-30710682</td>
+<td align="left">FLOT1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-5.067100</td>
+<td align="right">0.132</td>
+<td align="right">4.04e-07</td>
+<td align="right">0.031100</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:30695485-30710682</td>
+<td align="left">FLOT1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">4.936600</td>
+<td align="right">0.130</td>
+<td align="right">7.95e-07</td>
+<td align="right">0.030700</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:30695485-30710682</td>
+<td align="left">FLOT1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">4.936600</td>
+<td align="right">0.132</td>
+<td align="right">7.95e-07</td>
+<td align="right">0.031100</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:30695486-30710510</td>
+<td align="left">FLOT1</td>
+<td align="left">GTEx Cerebellum</td>
+<td align="right">-5.299000</td>
+<td align="right">0.130</td>
+<td align="right">1.16e-07</td>
+<td align="right">0.030700</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:30695486-30710510</td>
+<td align="left">FLOT1</td>
+<td align="left">GTEx Cerebellum</td>
+<td align="right">-5.299000</td>
+<td align="right">0.132</td>
+<td align="right">1.16e-07</td>
+<td align="right">0.031100</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:30695486-30710510</td>
+<td align="left">FLOT1</td>
+<td align="left">GTEx Pituitary</td>
+<td align="right">-5.253270</td>
+<td align="right">0.130</td>
+<td align="right">1.49e-07</td>
+<td align="right">0.030700</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:30695486-30710510</td>
+<td align="left">FLOT1</td>
+<td align="left">GTEx Pituitary</td>
+<td align="right">-5.253270</td>
+<td align="right">0.132</td>
+<td align="right">1.49e-07</td>
+<td align="right">0.031100</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:30695486-30710510</td>
+<td align="left">FLOT1</td>
+<td align="left">GTEx Thyroid</td>
+<td align="right">-5.557400</td>
+<td align="right">0.130</td>
+<td align="right">2.74e-08</td>
+<td align="right">0.030700</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:30695486-30710510</td>
+<td align="left">FLOT1</td>
+<td align="left">GTEx Thyroid</td>
+<td align="right">-5.557400</td>
+<td align="right">0.132</td>
+<td align="right">2.74e-08</td>
+<td align="right">0.031100</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:99817347-99842082</td>
+<td align="left">COQ3</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">5.146560</td>
+<td align="right">0.146</td>
+<td align="right">2.65e-07</td>
+<td align="right">0.030500</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">GTEx Adrenal Gland</td>
+<td align="right">5.505026</td>
+<td align="right">-0.187</td>
+<td align="right">3.69e-08</td>
+<td align="right">0.000894</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">GTEx Adrenal Gland</td>
+<td align="right">5.505026</td>
+<td align="right">-0.175</td>
+<td align="right">3.69e-08</td>
+<td align="right">0.007620</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">GTEx Adrenal Gland</td>
+<td align="right">5.505026</td>
+<td align="right">-0.178</td>
+<td align="right">3.69e-08</td>
+<td align="right">0.001790</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:12250867-12276886</td>
+<td align="left">TMEM106B</td>
+<td align="left">YFS Blood</td>
+<td align="right">5.373600</td>
+<td align="right">-0.187</td>
+<td align="right">7.72e-08</td>
+<td align="right">0.000894</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:12250867-12276886</td>
+<td align="left">TMEM106B</td>
+<td align="left">YFS Blood</td>
+<td align="right">5.373600</td>
+<td align="right">-0.175</td>
+<td align="right">7.72e-08</td>
+<td align="right">0.007620</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:12250867-12276886</td>
+<td align="left">TMEM106B</td>
+<td align="left">YFS Blood</td>
+<td align="right">5.373600</td>
+<td align="right">-0.178</td>
+<td align="right">7.72e-08</td>
+<td align="right">0.001790</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">PsychENCODE</td>
+<td align="right">-5.790690</td>
+<td align="right">-0.187</td>
+<td align="right">7.01e-09</td>
+<td align="right">0.000894</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">PsychENCODE</td>
+<td align="right">-5.790690</td>
+<td align="right">-0.175</td>
+<td align="right">7.01e-09</td>
+<td align="right">0.007620</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">PsychENCODE</td>
+<td align="right">-5.790690</td>
+<td align="right">-0.178</td>
+<td align="right">7.01e-09</td>
+<td align="right">0.001790</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">5.531000</td>
+<td align="right">-0.187</td>
+<td align="right">3.18e-08</td>
+<td align="right">0.000894</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">5.531000</td>
+<td align="right">-0.175</td>
+<td align="right">3.18e-08</td>
+<td align="right">0.007620</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:12250867-12282993</td>
+<td align="left">TMEM106B</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">5.531000</td>
+<td align="right">-0.178</td>
+<td align="right">3.18e-08</td>
+<td align="right">0.001790</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:24836158-25021253</td>
+<td align="left">OSBPL3</td>
+<td align="left">GTEx Pituitary</td>
+<td align="right">-5.622890</td>
+<td align="right">-0.138</td>
+<td align="right">1.88e-08</td>
+<td align="right">0.025700</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:24836158-25021253</td>
+<td align="left">OSBPL3</td>
+<td align="left">GTEx Pituitary</td>
+<td align="right">-5.622890</td>
+<td align="right">-0.158</td>
+<td align="right">1.88e-08</td>
+<td align="right">0.007180</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:64319682-64693151</td>
+<td align="left">SYNE2</td>
+<td align="left">NTR Blood</td>
+<td align="right">5.609528</td>
+<td align="right">0.168</td>
+<td align="right">2.03e-08</td>
+<td align="right">0.009600</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr14:75348593-75370450</td>
+<td align="left">DLST</td>
+<td align="left">CMC DLPFC</td>
+<td align="right">4.981400</td>
+<td align="right">-0.141</td>
+<td align="right">6.31e-07</td>
+<td align="right">0.029600</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:75348593-75370450</td>
+<td align="left">DLST</td>
+<td align="left">CMC DLPFC</td>
+<td align="right">4.981400</td>
+<td align="right">-0.134</td>
+<td align="right">6.31e-07</td>
+<td align="right">0.040200</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr14:75348594-75370448</td>
+<td align="left">DLST</td>
+<td align="left">PsychENCODE</td>
+<td align="right">5.089700</td>
+<td align="right">-0.141</td>
+<td align="right">3.59e-07</td>
+<td align="right">0.029600</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:75348594-75370448</td>
+<td align="left">DLST</td>
+<td align="left">PsychENCODE</td>
+<td align="right">5.089700</td>
+<td align="right">-0.134</td>
+<td align="right">3.59e-07</td>
+<td align="right">0.040200</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr14:103985996-103989448</td>
+<td align="left">CKB</td>
+<td align="left">YFS Blood</td>
+<td align="right">5.346000</td>
+<td align="right">0.129</td>
+<td align="right">8.99e-08</td>
+<td align="right">0.043300</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:103995508-104003410</td>
+<td align="left">TRMT61A</td>
+<td align="left">CMC DLPFC</td>
+<td align="right">5.051300</td>
+<td align="right">0.134</td>
+<td align="right">4.39e-07</td>
+<td align="right">0.035600</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr14:103995521-104003410</td>
+<td align="left">TRMT61A</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">4.977593</td>
+<td align="right">0.134</td>
+<td align="right">6.44e-07</td>
+<td align="right">0.035600</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr18:52385091-52562747</td>
+<td align="left">RAB27B</td>
+<td align="left">PsychENCODE</td>
+<td align="right">5.012900</td>
+<td align="right">-0.152</td>
+<td align="right">5.36e-07</td>
+<td align="right">0.012400</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr18:52495707-52562747</td>
+<td align="left">RAB27B</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">4.843190</td>
+<td align="right">-0.152</td>
+<td align="right">1.28e-06</td>
+<td align="right">0.012400</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr22:41487790-41576081</td>
+<td align="left">EP300</td>
+<td align="left">GTEx Cerebellum</td>
+<td align="right">5.493900</td>
+<td align="right">0.186</td>
+<td align="right">3.93e-08</td>
+<td align="right">0.003380</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr22:41487790-41576081</td>
+<td align="left">EP300</td>
+<td align="left">YFS Blood</td>
+<td align="right">5.059100</td>
+<td align="right">0.186</td>
+<td align="right">4.21e-07</td>
+<td align="right">0.003380</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Jansen vs our findings</caption>
+<thead>
+<tr class="header">
+<th align="left">Location</th>
+<th align="left">ID</th>
+<th align="left">PANEL_clean_short</th>
+<th align="right">DallAglio_Zscore</th>
+<th align="right">Jansen_zscore_controlsvscurrent</th>
+<th align="right">DallAglio_pvalue</th>
+<th align="right">Jansen_pvalue_controlsvscurrent</th>
+<th align="left">Consistent_dir_effect</th>
+<th align="left">Bonf_validated</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr1:92145902-92371892</td>
+<td align="left">TGFBR3</td>
+<td align="left">PsychENCODE</td>
+<td align="right">1.969894</td>
+<td align="right">-0.283</td>
+<td align="right">0.0489000</td>
+<td align="right">8.62e-06</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr1:154377669-154441926</td>
+<td align="left">IL6R</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">-2.562862</td>
+<td align="right">0.205</td>
+<td align="right">0.0104000</td>
+<td align="right">1.96e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr1:154377669-154441926</td>
+<td align="left">IL6R</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">-2.562862</td>
+<td align="right">0.210</td>
+<td align="right">0.0104000</td>
+<td align="right">2.14e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr1:154377669-154441926</td>
+<td align="left">IL6R</td>
+<td align="left">YFS Blood</td>
+<td align="right">-2.121342</td>
+<td align="right">0.205</td>
+<td align="right">0.0339000</td>
+<td align="right">1.96e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr1:154377669-154441926</td>
+<td align="left">IL6R</td>
+<td align="left">YFS Blood</td>
+<td align="right">-2.121342</td>
+<td align="right">0.210</td>
+<td align="right">0.0339000</td>
+<td align="right">2.14e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr1:176432307-176814735</td>
+<td align="left">PAPPA2</td>
+<td align="left">GTEx Substantia nigra</td>
+<td align="right">3.910660</td>
+<td align="right">0.238</td>
+<td align="right">0.0000920</td>
+<td align="right">2.74e-04</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2:71680852-71913898</td>
+<td align="left">DYSF</td>
+<td align="left">PsychENCODE</td>
+<td align="right">2.009264</td>
+<td align="right">0.254</td>
+<td align="right">0.0445000</td>
+<td align="right">1.40e-05</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr2:71680852-71913898</td>
+<td align="left">DYSF</td>
+<td align="left">PsychENCODE</td>
+<td align="right">2.009264</td>
+<td align="right">0.231</td>
+<td align="right">0.0445000</td>
+<td align="right">1.08e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2:71680852-71913898</td>
+<td align="left">DYSF</td>
+<td align="left">PsychENCODE</td>
+<td align="right">2.009264</td>
+<td align="right">0.231</td>
+<td align="right">0.0445000</td>
+<td align="right">1.92e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr2:235401681-235405693</td>
+<td align="left">ARL4C</td>
+<td align="left">NTR Blood</td>
+<td align="right">-2.642760</td>
+<td align="right">-0.235</td>
+<td align="right">0.0082200</td>
+<td align="right">1.07e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2:235401685-235405697</td>
+<td align="left">ARL4C</td>
+<td align="left">YFS Blood</td>
+<td align="right">-2.342520</td>
+<td align="right">-0.235</td>
+<td align="right">0.0192000</td>
+<td align="right">1.07e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr3:107762145-107809872</td>
+<td align="left">CD47</td>
+<td align="left">YFS Blood</td>
+<td align="right">-2.087970</td>
+<td align="right">-0.227</td>
+<td align="right">0.0368000</td>
+<td align="right">1.30e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr3:151961617-152183569</td>
+<td align="left">MBNL1</td>
+<td align="left">PsychENCODE</td>
+<td align="right">-2.382370</td>
+<td align="right">-0.162</td>
+<td align="right">0.0172000</td>
+<td align="right">2.73e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr3:151985828-152183569</td>
+<td align="left">MBNL1</td>
+<td align="left">CMC DLPFC</td>
+<td align="right">-2.754761</td>
+<td align="right">-0.162</td>
+<td align="right">0.0058700</td>
+<td align="right">2.73e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr3:151985828-152183569</td>
+<td align="left">MBNL1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">4.155040</td>
+<td align="right">-0.162</td>
+<td align="right">0.0000325</td>
+<td align="right">2.73e-04</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr5:173315283-173388979</td>
+<td align="left">CPEB4</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">2.672010</td>
+<td align="right">0.293</td>
+<td align="right">0.0075400</td>
+<td align="right">1.77e-06</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr6:108362613-108487058</td>
+<td align="left">OSTM1</td>
+<td align="left">GTEx Cortex</td>
+<td align="right">-1.966030</td>
+<td align="right">-0.231</td>
+<td align="right">0.0492950</td>
+<td align="right">2.47e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:21467651-21554162</td>
+<td align="left">SP4</td>
+<td align="left">NTR Blood</td>
+<td align="right">-3.045580</td>
+<td align="right">-0.242</td>
+<td align="right">0.0023220</td>
+<td align="right">1.64e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:21467652-21554440</td>
+<td align="left">SP4</td>
+<td align="left">PsychENCODE</td>
+<td align="right">2.048560</td>
+<td align="right">-0.242</td>
+<td align="right">0.0405000</td>
+<td align="right">1.64e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:21467652-21554440</td>
+<td align="left">SP4</td>
+<td align="left">GTEx Pituitary</td>
+<td align="right">2.843150</td>
+<td align="right">-0.242</td>
+<td align="right">0.0044700</td>
+<td align="right">1.64e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:21467652-21554440</td>
+<td align="left">SP4</td>
+<td align="left">GTEx Thyroid</td>
+<td align="right">2.969400</td>
+<td align="right">-0.242</td>
+<td align="right">0.0029800</td>
+<td align="right">1.64e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:21467688-21554151</td>
+<td align="left">SP4</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-2.543660</td>
+<td align="right">-0.242</td>
+<td align="right">0.0110000</td>
+<td align="right">1.64e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:23221237-23240630</td>
+<td align="left">NUPL2</td>
+<td align="left">NTR Blood</td>
+<td align="right">-2.247980</td>
+<td align="right">-0.221</td>
+<td align="right">0.0245770</td>
+<td align="right">1.28e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:23221446-23240628</td>
+<td align="left">NUPL2</td>
+<td align="left">GTEx Pituitary</td>
+<td align="right">-2.035400</td>
+<td align="right">-0.221</td>
+<td align="right">0.0418000</td>
+<td align="right">1.28e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:23221446-23240630</td>
+<td align="left">NUPL2</td>
+<td align="left">YFS Blood</td>
+<td align="right">-2.055800</td>
+<td align="right">-0.221</td>
+<td align="right">0.0398000</td>
+<td align="right">1.28e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:43648055-43769316</td>
+<td align="left">COA1</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">-2.099800</td>
+<td align="right">-0.222</td>
+<td align="right">0.0357000</td>
+<td align="right">2.24e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr8:62414205-62627155</td>
+<td align="left">ASPH</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">2.630040</td>
+<td align="right">0.236</td>
+<td align="right">0.0085400</td>
+<td align="right">1.25e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr8:91634223-91803777</td>
+<td align="left">TMEM64</td>
+<td align="left">GTEx Adrenal Gland</td>
+<td align="right">3.393900</td>
+<td align="right">-0.255</td>
+<td align="right">0.0006890</td>
+<td align="right">9.19e-05</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr8:91634223-91803860</td>
+<td align="left">TMEM64</td>
+<td align="left">PsychENCODE</td>
+<td align="right">3.358660</td>
+<td align="right">-0.255</td>
+<td align="right">0.0007830</td>
+<td align="right">9.19e-05</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr8:91634223-91803777</td>
+<td align="left">TMEM64</td>
+<td align="left">GTEx Thyroid</td>
+<td align="right">3.124600</td>
+<td align="right">-0.255</td>
+<td align="right">0.0017800</td>
+<td align="right">9.19e-05</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr8:91634223-91803777</td>
+<td align="left">TMEM64</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">4.326630</td>
+<td align="right">-0.255</td>
+<td align="right">0.0000151</td>
+<td align="right">9.19e-05</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr8:91634227-91803859</td>
+<td align="left">TMEM64</td>
+<td align="left">NTR Blood</td>
+<td align="right">3.585800</td>
+<td align="right">-0.255</td>
+<td align="right">0.0003360</td>
+<td align="right">9.19e-05</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr8:102698769-103137135</td>
+<td align="left">NCALD</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">2.296500</td>
+<td align="right">-0.260</td>
+<td align="right">0.0216470</td>
+<td align="right">1.43e-05</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr8:102698771-103137135</td>
+<td align="left">NCALD</td>
+<td align="left">YFS Blood</td>
+<td align="right">-1.998400</td>
+<td align="right">-0.260</td>
+<td align="right">0.0456780</td>
+<td align="right">1.43e-05</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr8:125563031-125740730</td>
+<td align="left">MTSS1</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">2.001870</td>
+<td align="right">-0.256</td>
+<td align="right">0.0453000</td>
+<td align="right">1.13e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr8:125563031-125740730</td>
+<td align="left">MTSS1</td>
+<td align="left">YFS Blood</td>
+<td align="right">2.150700</td>
+<td align="right">-0.256</td>
+<td align="right">0.0315000</td>
+<td align="right">1.13e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr9:19230762-19374137</td>
+<td align="left">DENND4C</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-2.128000</td>
+<td align="right">-0.226</td>
+<td align="right">0.0333370</td>
+<td align="right">2.08e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr9:102861510-103063426</td>
+<td align="left">INVS</td>
+<td align="left">NTR Blood</td>
+<td align="right">2.465700</td>
+<td align="right">-0.249</td>
+<td align="right">0.0137000</td>
+<td align="right">1.88e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr9:102861538-103063282</td>
+<td align="left">INVS</td>
+<td align="left">GTEx Cortex</td>
+<td align="right">1.963500</td>
+<td align="right">-0.249</td>
+<td align="right">0.0495800</td>
+<td align="right">1.88e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr9:102861538-103063282</td>
+<td align="left">INVS</td>
+<td align="left">GTEx Nucleus accumbens</td>
+<td align="right">1.960990</td>
+<td align="right">-0.249</td>
+<td align="right">0.0498800</td>
+<td align="right">1.88e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr9:102861538-103063282</td>
+<td align="left">INVS</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">1.967980</td>
+<td align="right">-0.249</td>
+<td align="right">0.0491000</td>
+<td align="right">1.88e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr11:33762485-33796089</td>
+<td align="left">FBXO3</td>
+<td align="left">YFS Blood</td>
+<td align="right">2.689500</td>
+<td align="right">-0.242</td>
+<td align="right">0.0071600</td>
+<td align="right">1.75e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr11:33762489-33796071</td>
+<td align="left">FBXO3</td>
+<td align="left">NTR Blood</td>
+<td align="right">2.768300</td>
+<td align="right">-0.242</td>
+<td align="right">0.0056350</td>
+<td align="right">1.75e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr11:118064455-118095809</td>
+<td align="left">AMICA1</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">-2.773880</td>
+<td align="right">0.248</td>
+<td align="right">0.0055400</td>
+<td align="right">4.34e-05</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr11:120195837-120204388</td>
+<td align="left">TMEM136</td>
+<td align="left">CMC DLPFC</td>
+<td align="right">2.799790</td>
+<td align="right">0.242</td>
+<td align="right">0.0051100</td>
+<td align="right">2.08e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr11:120195838-120204391</td>
+<td align="left">TMEM136</td>
+<td align="left">GTEx Adrenal Gland</td>
+<td align="right">2.314160</td>
+<td align="right">0.242</td>
+<td align="right">0.0207000</td>
+<td align="right">2.08e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr11:120195838-120204391</td>
+<td align="left">TMEM136</td>
+<td align="left">PsychENCODE</td>
+<td align="right">2.569810</td>
+<td align="right">0.242</td>
+<td align="right">0.0102000</td>
+<td align="right">2.08e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr12:68042118-68059186</td>
+<td align="left">DYRK2</td>
+<td align="left">PsychENCODE</td>
+<td align="right">2.022380</td>
+<td align="right">-0.232</td>
+<td align="right">0.0431000</td>
+<td align="right">2.87e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr12:102139275-102224716</td>
+<td align="left">GNPTAB</td>
+<td align="left">GTEx Caudate</td>
+<td align="right">2.714700</td>
+<td align="right">-0.239</td>
+<td align="right">0.0066300</td>
+<td align="right">1.05e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr12:102139275-102224716</td>
+<td align="left">GNPTAB</td>
+<td align="left">GTEx Thyroid</td>
+<td align="right">-3.440580</td>
+<td align="right">-0.239</td>
+<td align="right">0.0005800</td>
+<td align="right">1.05e-04</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr13:111767623-111947542</td>
+<td align="left">ARHGEF7</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-2.395100</td>
+<td align="right">-0.223</td>
+<td align="right">0.0166160</td>
+<td align="right">1.51e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr13:111767623-111947542</td>
+<td align="left">ARHGEF7</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">2.482300</td>
+<td align="right">-0.223</td>
+<td align="right">0.0130540</td>
+<td align="right">1.51e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:53503457-53620046</td>
+<td align="left">DDHD1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-2.190690</td>
+<td align="right">-0.226</td>
+<td align="right">0.0285000</td>
+<td align="right">5.95e-05</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr14:56025790-56168244</td>
+<td align="left">KTN1</td>
+<td align="left">PsychENCODE</td>
+<td align="right">-3.357870</td>
+<td align="right">-0.212</td>
+<td align="right">0.0007850</td>
+<td align="right">2.38e-04</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:56046924-56151302</td>
+<td align="left">KTN1</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">-3.841650</td>
+<td align="right">-0.212</td>
+<td align="right">0.0001220</td>
+<td align="right">2.38e-04</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr14:56046925-56168244</td>
+<td align="left">KTN1</td>
+<td align="left">GTEx Cerebellum</td>
+<td align="right">-3.341430</td>
+<td align="right">-0.212</td>
+<td align="right">0.0008330</td>
+<td align="right">2.38e-04</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:75598173-75643334</td>
+<td align="left">TMED10</td>
+<td align="left">PsychENCODE</td>
+<td align="right">-3.214700</td>
+<td align="right">-0.250</td>
+<td align="right">0.0013100</td>
+<td align="right">2.57e-05</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">chr16:3292028-3306627</td>
+<td align="left">MEFV</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">-2.208440</td>
+<td align="right">0.254</td>
+<td align="right">0.0272100</td>
+<td align="right">8.29e-05</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr16:58741035-58768261</td>
+<td align="left">GOT2</td>
+<td align="left">GTEx Adrenal Gland</td>
+<td align="right">-2.009775</td>
+<td align="right">-0.242</td>
+<td align="right">0.0445000</td>
+<td align="right">2.63e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr16:58741035-58768261</td>
+<td align="left">GOT2</td>
+<td align="left">GTEx Thyroid</td>
+<td align="right">2.504040</td>
+<td align="right">-0.242</td>
+<td align="right">0.0123000</td>
+<td align="right">2.63e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr16:58741035-58768261</td>
+<td align="left">GOT2</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="right">2.134320</td>
+<td align="right">-0.242</td>
+<td align="right">0.0328200</td>
+<td align="right">2.63e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr18:10525902-10552757</td>
+<td align="left">NAPG</td>
+<td align="left">GTEx Frontal Cortex</td>
+<td align="right">-2.021900</td>
+<td align="right">-0.240</td>
+<td align="right">0.0431840</td>
+<td align="right">3.09e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr22:21987005-21991616</td>
+<td align="left">CCDC116</td>
+<td align="left">GTEx Frontal Cortex</td>
+<td align="right">2.031400</td>
+<td align="right">0.244</td>
+<td align="right">0.0422000</td>
+<td align="right">1.87e-04</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr22:36677322-36784063</td>
+<td align="left">MYH9</td>
+<td align="left">CMC DLPFC</td>
+<td align="right">-2.540000</td>
+<td align="right">0.223</td>
+<td align="right">0.0111000</td>
+<td align="right">2.42e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">chr22:36677327-36784063</td>
+<td align="left">MYH9</td>
+<td align="left">PsychENCODE</td>
+<td align="right">-3.110229</td>
+<td align="right">0.223</td>
+<td align="right">0.0018700</td>
+<td align="right">2.42e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">chr22:36677327-36784063</td>
+<td align="left">MYH9</td>
+<td align="left">YFS Blood</td>
+<td align="right">-2.885900</td>
+<td align="right">0.223</td>
+<td align="right">0.0039000</td>
+<td align="right">2.42e-04</td>
+<td align="left">No</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+</details>
 <hr />
 <p><em>Report ended</em></p>
-</details>
-</div>
-</div>
 </div>
 </div>
 
