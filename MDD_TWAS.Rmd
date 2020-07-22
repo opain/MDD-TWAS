@@ -2144,15 +2144,11 @@ cp /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS-GSEA/ByPanel/MDD_TWAS
 
 # Comparison with previous literature
 
+Lorenza has prepared results files of previous studies for this comparison.
+
 ***
 
 ## TWAS literature
-
-I need Lorenza to send me the results files whe prepared previously for this comparison. Alternatively, Lorenza could run this section. The below code has not been run or edited to work with new files yet.
-
-***
-
-### Wray et al. (2018) and Gaspar et al. (2019)
 
 <details><summary>Show code</summary>
 ```{R, eval=F, echo=T}
@@ -2160,18 +2156,16 @@ I need Lorenza to send me the results files whe prepared previously for this com
 # Comparing our results to previous TWASs
 ###############################################
 # our TWAS, Wray et al TWAS, Gaspar et al. TWAS
-
-rm(list=ls())
 ###
 # Load data
 ###
 library(data.table)
 #these are all files with significant features only. NB the Gaspar file includes findings from all snp weights from any 
 #gene sign. in at least one tissue
-our_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/AllTissues_CLEAN.txt")
-our_hits_sign <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/signtest.AllTissues_CLEAN.txt")
-Gaspar_hits <- fread("C:/Users/loryd/Desktop/MSc dissertation/mock data/Gaspar et al. hits.txt")
-Wray_hits <- fread("C:/Users/loryd/Desktop/MSc dissertation/mock data/Wray et al. hits.csv")
+our_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_CLEAN.txt")
+our_hits_sign <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_TWSig_CLEAN.txt")
+Gaspar_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Gaspar\ et\ al.\ hits.csv")
+Wray_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Wray\ et\ al.\ hits.csv")
 
 ###
 # Structure df so that they are similar
@@ -2232,30 +2226,35 @@ sign_genes_our <- our_hits_sign$ID
 sign_genes_Wray <- Wray_hits_filt$ID
 sign_genes_Gaspar <- Gaspar_hits2$ID
 
-Gaspar <- unique(sign_genes_Gaspar) #25 unique genes
-Wray <- unique(sign_genes_Wray) #17 unique genes
-Us <- unique(sign_genes_our) #91 unique genes 
+Gaspar <- unique(sign_genes_Gaspar)
+length(Gaspar) #25 unique genes
+Wray <- unique(sign_genes_Wray)
+length(Wray) #17 unique genes
+Us <- unique(sign_genes_our)
+length(Us) #94 unique genes 
 
 #create a general variable with all sign. genes in any paper
 All <- c(Gaspar, Wray, Us)
-All #133 features
+length(All) #136 features
 
 #keep only unique gene IDs
 All_unique <- unique(All)
-All_unique #106 genes
+length(All_unique) #108 genes
 
 ###
 #Keep only genes sign, in either of the three studies
 ###
 
 #filter by genes which are in the vector containing sign. features in any of the studies
-our_hits_final <- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  #629 observations
+our_hits_final <- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  
+dim(our_hits_final)[1] #675 observations
 
 #keep only unique genes in our study (those with the greatest absolute z-score)
 our_hits_final<-our_hits_final[!is.na(our_hits_final$TWAS.Z),]
 our_hits_final2 <- our_hits_final[order(abs(our_hits_final$TWAS.Z), decreasing = T), ]
 library(dplyr)
-our_hits_final3  <- our_hits_final2 %>% distinct(ID, .keep_all = T) #102 obs.
+our_hits_final3  <- our_hits_final2 %>% distinct(ID, .keep_all = T)
+dim(our_hits_final3)[1] #107 obs.
 
 our_hits_correct <- our_hits_final3
 
@@ -2263,7 +2262,8 @@ our_hits_correct <- our_hits_final3
 Gaspar_hits2b<-Gaspar_hits2[!is.na(Gaspar_hits2$TWAS.Z),]
 Gaspar_hits3 <- Gaspar_hits2b[order(abs(Gaspar_hits2b$TWAS.Z), decreasing = T), ]
 library(dplyr)
-Gaspar_hits4  <- Gaspar_hits3 %>% distinct(ID, .keep_all = T) #25 gene IDs, as expected 
+Gaspar_hits4  <- Gaspar_hits3 %>% distinct(ID, .keep_all = T)
+dim(Gaspar_hits4)[1] #25 gene IDs 
 
 Gaspar_correct <- Gaspar_hits4
 
@@ -2293,11 +2293,9 @@ our_hits_correct$TWAS.P <- NULL
 our_hits_correct$PANEL <- NULL
 our_hits_correct$PANEL_clean_short <- NULL
 
-
 Wray_hits_correct$CHR <- NULL
 Wray_hits_correct$Wray_TWAS.P <- NULL
 Wray_hits_correct$TWAS.P <- NULL
-
 
 Gaspar_correct$CHR <- NULL
 Gaspar_correct$PANEL <- NULL
@@ -2311,11 +2309,12 @@ Gaspar_correct <- as_tibble(Gaspar_correct) #transform all df into tibbles to us
 ##df are already tibbles. this was the only one left to convert
 
 #join hits bw Gaspar and our study
-table_correct<- full_join(our_hits_correct, Gaspar_correct) #dim 106, 7
+table_correct<- full_join(our_hits_correct, Gaspar_correct)
+dim(table_correct)[1] # 108
 
 #merge the newly created table with the wray et al findings too
-table_correct2 <- full_join(table_correct, Wray_hits_correct)  #dim 106, 8 
-
+table_correct2 <- full_join(table_correct, Wray_hits_correct)  #dim 108, 8 
+dim(table_correct2)[1] # 108
 
 #check that no gene is repeated and that z-scores are present for the three studies (should be high z-scores)
 table_correct2 <- table_correct2[order(table_correct2$ID), ]
@@ -2325,7 +2324,7 @@ table_correct2 #everything looks fine
 table_correct2$DallAglio_TWAS.P <- NULL
 
 #add a column saying whether the gene was transcriptome-wide sign. in our study 
-table_correct2$Transcriptome_wide_sign_DallAglio <- ifelse(table_correct2$DallAglio_TWAS.Z > 4.74 | table_correct2$DallAglio_TWAS.Z < -4.74, "Sign.", "Not Sign.")
+table_correct2$Transcriptome_wide_sign_DallAglio <- ifelse(table_correct2$DallAglio_TWAS.Z > 4.83 | table_correct2$DallAglio_TWAS.Z < -4.83, "Sign.", "Not Sign.")
 
 ###
 # Clean up and save
@@ -2340,15 +2339,19 @@ my_data2
 
 
 #save as csv file (each df col is treated as independent col, +excel format)
-write.csv(my_data2, '/users/k1806347/brc_scratch/Analyses/Lorenza/Output/table/comparison_previousTWASs.csv', row.names=F)
+write.csv(my_data2, '/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/comparison_previousTWASs.csv', row.names=F)
 my_data2
 
 ```
+</details>
 
-**Findings** 
-When comparing the Wray et al. (2018) results from the CMC DLPFC with our findings, we can observe that we obtained identical results in terms of TWAS z-values. This is true also for two genes which do not show concordance in effect size: SLC25A17 and DENND1B. This is due to us findings stronger associations in those genes  in panels which were not tested by the Wray et al study (i.e. the nucleus accumbens and the CMC DLPFC splicing). Generally, Wray et al. (2018) identified a greater number of associations, but this was due to the lower multiple testing burden they presented as opposed to our study which tested 20 SNP-weight sets instead of one.  
+<details><summary>Show comparison with previous TWAS</summary>
+```{R, echo=F, eval=T}
+res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/comparison_previousTWASs.csv')
 
-When comparing the Gaspar et al. (2019) results with our findings, it can be noted that results were generally very similar. Inconsistencies were present in four genes (DENND1B, KLC1, ZMYND8, ZNF165), where different directions of effect were identified. This is due to (i) the association being the strongest in our study within the CMC DLPFC splicing panel (where inconsistent direction of effects are generally present), (ii) our finding being from a SNP-weight panel not tested in the Gaspar et al. study (e.g. KLC1 z-score = -4.7 for the thyroid and ZNF165 z-score = 4.18 for the thyroid tissue), (iii) the Gaspar et al. study testing SNP-weight panels we did not test (e.g. for ZMYND8, a high z-score was found by them in the DGN whole blood panel). Interestingly, four associations within genes which were not tested in our study due to their low heritability in the tested SNP-weights were instead identified by the Gaspar study, namely BTN1A1, HIST1H2AK, TMEM33, TMX2.These were the strongest and significant in the DGN blood weight set (for BTN1A1, HIST1H2AK and TMX2), and in the GTEx cerebellum SNPweight set for TMEM33. The latter is of high interest since the same SNP-weight was tested in our study, but it could not surpass the heritability threshold for feature selection. 
+library(knitr)
+kable(res, rownames = FALSE, caption='Comparison with previous TWAS', digits = 32)
+```
 
 </details>
 
@@ -2356,11 +2359,7 @@ When comparing the Gaspar et al. (2019) results with our findings, it can be not
 
 ## Observed gene expression TWAS of depression 
 
-***
-
-### Our finding compared to those from Jansen et al. (2016)
-
-<details><summary>Show code</summary>
+<details><summary>Our findings compared to Jansen et al. (2016)</summary>
 ```{R, eval=F, echo=T}
 ##################
 # Comparing our findings to the findings from Jansen et al. (TWAS of observed gene expression)
@@ -2370,13 +2369,12 @@ When comparing the Gaspar et al. (2019) results with our findings, it can be not
 # Load data
 ###
 
-rm(list=ls())
-
 library(data.table)
 library(dplyr)
-our_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/signtest.AllTissues_CLEAN.txt")
-Jansen_alloutput <- fread("C:/Users/loryd/Desktop/MSc dissertation/mock data/Jansen et al. hits.csv")
-our_alloutput <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Output/raw_findings/AllTissues_CLEAN.txt")
+
+our_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_TWSig_CLEAN.txt")
+Jansen_alloutput <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Jansen\ et\ al.\ hits.csv")
+our_alloutput <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_CLEAN.txt")
 
 #filter for significant features only in the Jansen paper
 colnames(Jansen_alloutput)
@@ -2398,15 +2396,16 @@ Jansen_alloutput[order(Jansen_alloutput$Gene), ]
 table_ourvsJansen2 <- merge(our_hits, Jansen_alloutput, by.x = "ID", by.y = "Gene")
 
 validated <- table_ourvsJansen2[(table_ourvsJansen2$`P control vs current`< 0.05), ]
-#42 features which were significant in our study, were also nominally significant in their study (for either one of the three comparison types)
+dim(validated)[1] # 44
+#44 features which were significant in our study, were also nominally significant in their study (for either one of the three comparison types)
 
 unique(validated$ID)
-#these 42 hits corresponded to 14 unique genes
-#[1] "ANKRD44"  "CKB"      "COQ3"     "DLST"     "EP300"    "FLOT1"    "OSBPL3"   "PCDHA8"   "RAB27B"  
-#[10] "RERE"     "SYNE2"    "TMEM106B" "TRMT61A"  "ZSCAN16" 
+#these 44 hits corresponded to 14 unique genes
+#[1] "ANKRD44"  "CKB"      "COQ3"     "DLST"     "EP300"    "FLOT1"
+#[7] "OSBPL3"   "PCDHA8"   "RAB27B"   "RERE"     "SYNE2"    "TMEM106B"
+#[13] "TRMT61A"  "ZSCAN16"
 
-nrow(validated)  #42 rows
-
+nrow(validated)  #44 rows
 
 ###
 #create a table comparing our findings to theirs
@@ -2450,12 +2449,13 @@ validated$Bonf_validated <- ifelse(validated$Jansen_pvalue_controlsvscurrent < 0
 
 validated$Consistent_dir_effect <- ifelse((validated$Jansen_zscore_controlsvscurrent > 0 & validated$DallAglio_Zscore > 0) | (validated$Jansen_zscore_controlsvscurrent < 0 & validated$DallAglio_Zscore <0), "Yes", "No")
 
-sum(validated$Consistent_dir_effect == "Yes")  #17 associations present the same direction of effect
-sum(validated$Consistent_dir_effect == "No") #25 associations present a different direction of effect
+sum(validated$Consistent_dir_effect == "Yes")  #16 associations present the same direction of effect
+sum(validated$Consistent_dir_effect == "No") #28 associations present a different direction of effect
 
 sum(validated$Bonf_validated == "Yes") #12 associations Bonferroni validated
-print(validated$ID[validated$Bonf_validated == "Yes"]) # "RERE"     "RERE"     "TMEM106B" "TMEM106B" "TMEM106B" "TMEM106B" "TMEM106B" "TMEM106B" "TMEM106B"
-#"TMEM106B" "EP300"    "EP300" 
+print(validated$ID[validated$Bonf_validated == "Yes"]) 
+#[1] "RERE"     "RERE"     "TMEM106B" "TMEM106B" "TMEM106B" "TMEM106B" "TMEM106B"
+#[8] "TMEM106B" "TMEM106B" "TMEM106B" "EP300"    "EP300"
 
 #these 12 validated associations come from 3 unique genes = RERE, TMEM106B, EP300
 
@@ -2465,21 +2465,15 @@ col_order_2 <- c("Location", "ID", "PANEL_clean_short", "DallAglio_Zscore", "Jan
 validated <- validated[, col_order_2]
 head(validated)
 
-
 #save as csv file (each df col is treated as independent col, +excel format)
-write.csv(validated, '/users/k1806347/brc_scratch/Analyses/Lorenza/Output/table/OurFindingsvsJansen_correct.csv', row.names = F)
+write.csv(validated, '/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/OurFindingsvsJansen_correct.csv', row.names = F)
 
 validated
 ```
-*Findings* When comparing our findings to  those from Jansen et al. (2016) it can be observed that their results could validate 42 of our associations at a nominal p-value level and 12 at a Bonferroni significance level. Of these associations, 14 and 3 unique genes could be validated, respectively. The three Bonferroni validated genes include RERE, TMEM106B, EP300. However, for RERE, TMEM106B, inconsistent direction of effect was generally present. Contrarily, EP300 was consistently upregulated in both studies. 
 
 </details>
 
-***
-
-#### Jansen et al. (2016) findings compared to ours
-
-<details><summary>Show code</summary>
+<details><summary>Jansen et al. (2016) findings compared to ours</summary>
 ```{R, eval=F, echo=T}
 ####
 # Comparing the Jansen et al results to ours 
@@ -2494,12 +2488,16 @@ Jansen_sign[order(Jansen_sign$Gene), ]
 table_Jansenvsours <- merge(our_alloutput, Jansen_sign, by.x = "ID", by.y = "Gene")
 
 Replicated_byus <- table_Jansenvsours[(table_Jansenvsours$TWAS.P < 0.05), ]
-#54 observations
+dim(Replicated_byus)[1]
+#66 observations
 
 unique(Replicated_byus$ID)
-#pertain to 28 IDs:  [1] "AMICA1"  "ARHGEF7" "ARL4C"   "ASPH"    "CCDC116" "CD47"    "COA1"    "CPEB4"   "DDHD1"   "DENND4C" "FBXO3"   "GNPTAB" 
-#[13] "GOT2"    "IL6R"    "INVS"    "KTN1"    "MBNL1"   "MEFV"    "MTSS1"   "MYH9"    "NAPG"    "NCALD"   "NUPL2"   "OSTM1"  
-#[25] "PAPPA2"  "SP4"     "TMEM136" "TMEM64"
+#pertain to 32 IDs:
+# [1] "AMICA1"  "ARHGEF7" "ARL4C"   "ASPH"    "CCDC116" "CD47"    "COA1"    "CPEB4"  
+# [9] "DDHD1"   "DENND4C" "DYRK2"   "DYSF"    "FBXO3"   "GNPTAB"  "GOT2"    "IL6R"   
+#[17] "INVS"    "KTN1"    "MBNL1"   "MEFV"    "MTSS1"   "MYH9"    "NAPG"    "NCALD"  
+#[25] "NUPL2"   "OSTM1"   "PAPPA2"  "SP4"     "TGFBR3"  "TMED10"  "TMEM136" "TMEM64"
+
 
 ###
 #FIx the table
@@ -2518,7 +2516,6 @@ Replicated_byus$P1 <- as.numeric(as.character(Replicated_byus$P1))
 
 Replicated_byus <- Replicated_byus[order(Replicated_byus$CHR, Replicated_byus$P0), ]
 
-
 #fix columns
 Replicated_byus$Location <- paste0('chr',Replicated_byus$CHR,':', Replicated_byus$P0,'-',Replicated_byus$P1)
 Replicated_byus$DallAglio_Zscore <- Replicated_byus$TWAS.Z
@@ -2536,23 +2533,24 @@ Replicated_byus
 # of effects is consistent across the two studies
 
 #1) Add the column with surpassing the Bonferroni sign. or not
-0.05 / 28    #Bonf. significance = nominal p value / number of unique genes
-# = 0.001785714
+0.05 / 32    #Bonf. significance = nominal p value / number of unique genes
+# = 0.0015625
 
-Replicated_byus$Bonf_validated <- ifelse(Replicated_byus$DallAglio_pvalue < 0.001785714, "Yes", "No")
+Replicated_byus$Bonf_validated <- ifelse(Replicated_byus$DallAglio_pvalue < 0.0015625, "Yes", "No")
 
 #2) add the column specifying whether direction of effects is consistent
 
 Replicated_byus$Consistent_dir_effect <- ifelse((Replicated_byus$Jansen_zscore_controlsvscurrent > 0 & Replicated_byus$DallAglio_Zscore > 0) | (Replicated_byus$Jansen_zscore_controlsvscurrent < 0 & Replicated_byus$DallAglio_Zscore <0), "Yes", "No")
 
-sum(Replicated_byus$Consistent_dir_effect == "Yes")  #26 associations present the same direction of effect
-sum(Replicated_byus$Consistent_dir_effect == "No") #28 associations present a different direction of effect
+sum(Replicated_byus$Consistent_dir_effect == "Yes")  #33 associations present the same direction of effect
+sum(Replicated_byus$Consistent_dir_effect == "No") #33 associations present a different direction of effect
 
-sum(Replicated_byus$Bonf_validated == "Yes") #9 associations Bonferroni validated
+sum(Replicated_byus$Bonf_validated == "Yes") #11 associations Bonferroni validated
 print(Replicated_byus$ID[Replicated_byus$Bonf_validated == "Yes"]) 
-# "PAPPA2" "MBNL1"  "TMEM64" "TMEM64" "TMEM64" "TMEM64" "GNPTAB" "KTN1"   "KTN1"
+#[1] "PAPPA2" "MBNL1"  "TMEM64" "TMEM64" "TMEM64" "TMEM64" "GNPTAB" "KTN1"   "KTN1"  
+#[10] "KTN1"   "TMED10"
 
-#these come from 5 unique genes = PAPPA2, MBNL1, TMEM64, GNPTAB, KTN1 
+#these come from 6 unique genes = PAPPA2, MBNL1, TMEM64, GNPTAB, KTN1, TMED10
 
 #change col order again
 col_order_3 <- c("Location", "ID", "PANEL_clean_short", "DallAglio_Zscore", "Jansen_zscore_controlsvscurrent", "DallAglio_pvalue", "Jansen_pvalue_controlsvscurrent", "Consistent_dir_effect", "Bonf_validated")
@@ -2560,16 +2558,28 @@ col_order_3 <- c("Location", "ID", "PANEL_clean_short", "DallAglio_Zscore", "Jan
 Replicated_byus <- Replicated_byus[, col_order_3]
 head(Replicated_byus)
 
-
 #save as csv file 
-write.csv(Replicated_byus, '/users/k1806347/brc_scratch/Analyses/Lorenza/Output/table/Jansenvsourfindings_correct.csv', row.names = F)
+write.csv(Replicated_byus, '/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Jansenvsourfindings_correct.csv', row.names = F)
 
 Replicated_byus
 
 ```
-*Findings* 54 associations in the Jansen et al. (2016) study were replicated by our findings at the nominal level in any tissue, while 9 at a Bonferroni significance threshold. Of these, 28 and 5 were from unique genes, respectively. Such unique genes are PAPPA2, MBNL1, TMEM64, GNPTAB, KTN1. Of note, half of the feature associations presented the same direction of effect.  
+</details>
+
+<details><summary>Show comparison with Jansen et al.</summary>
+```{R, echo=F, eval=T}
+res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/OurFindingsvsJansen_correct.csv')
+
+library(knitr)
+kable(res, rownames = FALSE, caption='Our Findings vs Jansen', digits = 32)
+
+res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Jansenvsourfindings_correct.csv')
+
+library(knitr)
+kable(res, rownames = FALSE, caption='Jansen vs our findings', digits = 32)
+```
+
+</details>
 
 ***
 *Report ended*
-
-</details>
