@@ -402,6 +402,11 @@ library(data.table)
 twas_sign <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_TWSig.txt")
 twas <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues.txt")
 
+dim(twas)[1] # 97733 features in PANELS
+sum(!is.na(twas$TWAS.P)) # 95720 features that could be imputed in GWAS
+length(unique(twas$ID)) # 22006 unique genes in PANELS
+length(unique(twas$ID[!is.na(twas$TWAS.P)])) # 21507 unique gene that could be imputed in GWAS
+
 twas_sign$BEST.GWAS.P<-2*pnorm(-abs(twas_sign$BEST.GWAS.Z))
 sum(twas_sign$BEST.GWAS.P > 5e-8) # 63
 sum(twas_sign$BEST.GWAS.P < 5e-8) # 113
@@ -1100,7 +1105,7 @@ cp /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS.TWAS_Z_heatm
 ![MDD TWAS Heatmap Brain](Images/MDD_TWAS.TWAS_Z_heatmap_brain.png)
 ***
 
-![MDD TWAS Heatmap Blood](Images/MDD_TWAS.TWAS_Z_heatmap_brain.png)
+![MDD TWAS Heatmap Blood](Images/MDD_TWAS.TWAS_Z_heatmap_blood.png)
 
 ***
 
@@ -1382,10 +1387,13 @@ kable(res, rownames = FALSE, caption='MDD TWAS Brief Conditional Results', digit
 ```{R, echo=F, eval=T}
 res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Conditional/MDD_TWAS_Conditional_table_novelty.csv')
 
+res<-res[,c('CHR','BP','ID','PANEL_clean','WGT','TWAS.P','BEST.GWAS.P','TOP.SNP.COR','Type','Novel')]
 names(res)<-c('CHR','BP','ID','PANEL','WGT','TWAS.P','BEST.GWAS.P','TOP.SNP.COR','TYPE','NOVEL')
 
+res$BEST.GWAS.P<-format(res$BEST.GWAS.P, scientific = TRUE, digits = 3)
+
 library(knitr)
-kable(res, rownames = FALSE, caption='MDD TWAS Results Novelty', digits = 32)
+kable(res, rownames = FALSE, caption='MDD TWAS Results Novelty compared to GWAS', digits = 32)
 ```
 
 </details>
@@ -2385,7 +2393,6 @@ library(tidyverse)
 our_hits <- as_tibble(our_hits)
 our_hits
 our_hits_filt <- our_hits %>% select("ID", "CHR", "P0", "P1", "TWAS.Z", "TWAS.P", "PANEL_clean_short")
-
 
 ###
 #Comparing our results vs Jansen et al's 
