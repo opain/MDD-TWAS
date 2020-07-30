@@ -8665,8 +8665,6 @@ fusion_focus_noMHC&lt;-fusion_focus[!(fusion_focus$CHR == 6 &amp; fusion_focus$P
 # Subset those which are high confidence
 fusion_focus_highConf&lt;-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T &amp; fusion_focus_noMHC$FOCUS_pip &gt; 0.5 &amp; fusion_focus_noMHC$TWAS.P &lt; 3.685926e-08,]
 
-# One high confidence gene is novel (TMEM106B)
-
 # Subset transcriptom-wide significant that colocalised and pip &gt; 0.5
 fusion_focus_TWsig&lt;-fusion_focus_noMHC[fusion_focus_noMHC$TWAS.P &lt; 1.368572e-06,]
 
@@ -8678,7 +8676,9 @@ fusion_focus_TWsig[(fusion_focus_TWsig$WGT %in% fusion_focus_TWsig$WGT[duplicate
 fusion_focus_TWsig&lt;-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T &amp; fusion_focus_noMHC$FOCUS_pip &gt; 0.5 &amp; fusion_focus_noMHC$TWAS.P &lt; 1.368572e-06,]
 
 write.csv(fusion_focus,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_sig_FOCUS_results.csv&#39;, row.names=F, quote=F)
-write.csv(focus,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv&#39;, row.names=F, quote=F)</code></pre>
+write.csv(focus,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv&#39;, row.names=F, quote=F)
+write.csv(fusion_focus_TWsig,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.TWSig_PIP5.csv&#39;, row.names=F, quote=F)
+write.csv(fusion_focus_highConf,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_HighConf_results.csv&#39;, row.names=F, quote=F)</code></pre>
 </details>
 <details>
 <p><summary>Show FOCUS and other combined results</summary></p>
@@ -12014,6 +12014,330 @@ write.csv(focus,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MD
 <td align="right">0.382000</td>
 <td align="left">22:40545828-22:42690262</td>
 <td align="left">chr22:41697526-41756151</td>
+</tr>
+</tbody>
+</table>
+</details>
+<details>
+<p><summary>Show TW-significant results with PIP &gt; 0.5</summary></p>
+<table>
+<caption>MDD TWAS:TW-significant results with PIP &gt; 0.5</caption>
+<thead>
+<tr class="header">
+<th align="left">WGT</th>
+<th align="right">CHR</th>
+<th align="right">P0</th>
+<th align="right">P1</th>
+<th align="left">SNP.weight.Set</th>
+<th align="left">ID</th>
+<th align="right">TWAS.Z</th>
+<th align="right">TWAS.P</th>
+<th align="left">Novel</th>
+<th align="left">Colocalised</th>
+<th align="right">FOCUS_in_cred_set</th>
+<th align="right">FOCUS_pip</th>
+<th align="left">FOCUS_region</th>
+<th align="left">Location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">YFS.BLOOD.RNAARR/YFS.RERE.wgt.RDat</td>
+<td align="right">1</td>
+<td align="right">8412457</td>
+<td align="right">8877702</td>
+<td align="left">YFS Blood</td>
+<td align="left">RERE</td>
+<td align="right">-5.310078</td>
+<td align="right">1.10e-07</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.504</td>
+<td align="left">1:7247335-1:9365199</td>
+<td align="left">chr1:8412457-8877702</td>
+</tr>
+<tr class="even">
+<td align="left">Whole_Blood/Whole_Blood.ENSG00000172260.9.wgt.RDat</td>
+<td align="right">1</td>
+<td align="right">71861623</td>
+<td align="right">72748417</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="left">NEGR1</td>
+<td align="right">8.760622</td>
+<td align="right">1.94e-18</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">1.000</td>
+<td align="left">1:71684606-1:74326484</td>
+<td align="left">chr1:71861623-72748417</td>
+</tr>
+<tr class="odd">
+<td align="left">CMC.BRAIN.RNASEQ/CMC.DENND1B.wgt.RDat</td>
+<td align="right">1</td>
+<td align="right">197473878</td>
+<td align="right">197744623</td>
+<td align="left">CMC DLPFC</td>
+<td align="left">DENND1B</td>
+<td align="right">4.848374</td>
+<td align="right">1.24e-06</td>
+<td align="left">Yes</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.725</td>
+<td align="left">1:197311514-1:199239815</td>
+<td align="left">chr1:197473878-197744623</td>
+</tr>
+<tr class="even">
+<td align="left">CMC.BRAIN.RNASEQ_SPLICING/CMC.chr2:58388773:58390001:clu_36265.wgt.RDat</td>
+<td align="right">2</td>
+<td align="right">58386377</td>
+<td align="right">58468515</td>
+<td align="left">CMC DLPFC Splicing</td>
+<td align="left">FANCL</td>
+<td align="right">4.897476</td>
+<td align="right">9.71e-07</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.800</td>
+<td align="left">2:57429100-2:58296890</td>
+<td align="left">chr2:58386377-58468515</td>
+</tr>
+<tr class="odd">
+<td align="left">Brain_Frontal_Cortex_BA9/Brain_Frontal_Cortex_BA9.ENSG00000250377.1.wgt.RDat</td>
+<td align="right">5</td>
+<td align="right">87988462</td>
+<td align="right">87989789</td>
+<td align="left">GTEx Frontal Cortex</td>
+<td align="left">CTC-467M3.3</td>
+<td align="right">-7.091600</td>
+<td align="right">1.33e-12</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.839</td>
+<td align="left">5:87390031-5:88891530</td>
+<td align="left">chr5:87988462-87989789</td>
+</tr>
+<tr class="even">
+<td align="left">Whole_Blood/Whole_Blood.ENSG00000106460.14.wgt.RDat</td>
+<td align="right">7</td>
+<td align="right">12250867</td>
+<td align="right">12282993</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="left">TMEM106B</td>
+<td align="right">5.531000</td>
+<td align="right">3.18e-08</td>
+<td align="left">Yes</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.614</td>
+<td align="left">7:11299198-7:12635461</td>
+<td align="left">chr7:12250867-12282993</td>
+</tr>
+<tr class="odd">
+<td align="left">Brain_Cerebellum/Brain_Cerebellum.ENSG00000165379.9.wgt.RDat</td>
+<td align="right">14</td>
+<td align="right">42076773</td>
+<td align="right">42373752</td>
+<td align="left">GTEx Cerebellum</td>
+<td align="left">LRFN5</td>
+<td align="right">5.597540</td>
+<td align="right">2.17e-08</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.504</td>
+<td align="left">14:41615719-14:43137256</td>
+<td align="left">chr14:42076773-42373752</td>
+</tr>
+<tr class="even">
+<td align="left">Thyroid/Thyroid.ENSG00000151838.7.wgt.RDat</td>
+<td align="right">14</td>
+<td align="right">59971779</td>
+<td align="right">60043549</td>
+<td align="left">GTEx Thyroid</td>
+<td align="left">CCDC175</td>
+<td align="right">-5.478850</td>
+<td align="right">4.28e-08</td>
+<td align="left">Yes</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.609</td>
+<td align="left">14:59448336-14:61680201</td>
+<td align="left">chr14:59971779-60043549</td>
+</tr>
+<tr class="odd">
+<td align="left">Pituitary/Pituitary.ENSG00000140009.14.wgt.RDat</td>
+<td align="right">14</td>
+<td align="right">64550950</td>
+<td align="right">64770377</td>
+<td align="left">GTEx Pituitary</td>
+<td align="left">ESR2</td>
+<td align="right">-5.982300</td>
+<td align="right">2.20e-09</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.593</td>
+<td align="left">14:63790015-14:65220117</td>
+<td align="left">chr14:64550950-64770377</td>
+</tr>
+<tr class="even">
+<td align="left">Thyroid/Thyroid.ENSG00000119608.8.wgt.RDat</td>
+<td align="right">14</td>
+<td align="right">75319736</td>
+<td align="right">75330537</td>
+<td align="left">GTEx Thyroid</td>
+<td align="left">PROX2</td>
+<td align="right">-5.758100</td>
+<td align="right">8.51e-09</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.718</td>
+<td align="left">14:72889754-14:76444767</td>
+<td align="left">chr14:75319736-75330537</td>
+</tr>
+<tr class="odd">
+<td align="left">Adrenal_Gland/Adrenal_Gland.ENSG00000221995.4.wgt.RDat</td>
+<td align="right">17</td>
+<td align="right">27401933</td>
+<td align="right">27405875</td>
+<td align="left">GTEx Adrenal Gland</td>
+<td align="left">TIAF1</td>
+<td align="right">-5.361200</td>
+<td align="right">8.27e-08</td>
+<td align="left">Yes</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.746</td>
+<td align="left">17:27334244-17:29786491</td>
+<td align="left">chr17:27401933-27405875</td>
+</tr>
+</tbody>
+</table>
+</details>
+<details>
+<p><summary>Show High-confidence associations results</summary></p>
+<table>
+<caption>MDD TWAS: High confidence results</caption>
+<thead>
+<tr class="header">
+<th align="left">WGT</th>
+<th align="right">CHR</th>
+<th align="right">P0</th>
+<th align="right">P1</th>
+<th align="left">SNP.weight.Set</th>
+<th align="left">ID</th>
+<th align="right">TWAS.Z</th>
+<th align="right">TWAS.P</th>
+<th align="left">Novel</th>
+<th align="left">Colocalised</th>
+<th align="right">FOCUS_in_cred_set</th>
+<th align="right">FOCUS_pip</th>
+<th align="left">FOCUS_region</th>
+<th align="left">Location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Whole_Blood/Whole_Blood.ENSG00000172260.9.wgt.RDat</td>
+<td align="right">1</td>
+<td align="right">71861623</td>
+<td align="right">72748417</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="left">NEGR1</td>
+<td align="right">8.760622</td>
+<td align="right">1.94e-18</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">1.000</td>
+<td align="left">1:71684606-1:74326484</td>
+<td align="left">chr1:71861623-72748417</td>
+</tr>
+<tr class="even">
+<td align="left">Brain_Frontal_Cortex_BA9/Brain_Frontal_Cortex_BA9.ENSG00000250377.1.wgt.RDat</td>
+<td align="right">5</td>
+<td align="right">87988462</td>
+<td align="right">87989789</td>
+<td align="left">GTEx Frontal Cortex</td>
+<td align="left">CTC-467M3.3</td>
+<td align="right">-7.091600</td>
+<td align="right">1.33e-12</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.839</td>
+<td align="left">5:87390031-5:88891530</td>
+<td align="left">chr5:87988462-87989789</td>
+</tr>
+<tr class="odd">
+<td align="left">Whole_Blood/Whole_Blood.ENSG00000106460.14.wgt.RDat</td>
+<td align="right">7</td>
+<td align="right">12250867</td>
+<td align="right">12282993</td>
+<td align="left">GTEx Whole Blood</td>
+<td align="left">TMEM106B</td>
+<td align="right">5.531000</td>
+<td align="right">3.18e-08</td>
+<td align="left">Yes</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.614</td>
+<td align="left">7:11299198-7:12635461</td>
+<td align="left">chr7:12250867-12282993</td>
+</tr>
+<tr class="even">
+<td align="left">Brain_Cerebellum/Brain_Cerebellum.ENSG00000165379.9.wgt.RDat</td>
+<td align="right">14</td>
+<td align="right">42076773</td>
+<td align="right">42373752</td>
+<td align="left">GTEx Cerebellum</td>
+<td align="left">LRFN5</td>
+<td align="right">5.597540</td>
+<td align="right">2.17e-08</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.504</td>
+<td align="left">14:41615719-14:43137256</td>
+<td align="left">chr14:42076773-42373752</td>
+</tr>
+<tr class="odd">
+<td align="left">Pituitary/Pituitary.ENSG00000140009.14.wgt.RDat</td>
+<td align="right">14</td>
+<td align="right">64550950</td>
+<td align="right">64770377</td>
+<td align="left">GTEx Pituitary</td>
+<td align="left">ESR2</td>
+<td align="right">-5.982300</td>
+<td align="right">2.20e-09</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.593</td>
+<td align="left">14:63790015-14:65220117</td>
+<td align="left">chr14:64550950-64770377</td>
+</tr>
+<tr class="even">
+<td align="left">Thyroid/Thyroid.ENSG00000119608.8.wgt.RDat</td>
+<td align="right">14</td>
+<td align="right">75319736</td>
+<td align="right">75330537</td>
+<td align="left">GTEx Thyroid</td>
+<td align="left">PROX2</td>
+<td align="right">-5.758100</td>
+<td align="right">8.51e-09</td>
+<td align="left">No</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="right">0.718</td>
+<td align="left">14:72889754-14:76444767</td>
+<td align="left">chr14:75319736-75330537</td>
 </tr>
 </tbody>
 </table>
