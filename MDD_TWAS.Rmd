@@ -1563,8 +1563,6 @@ fusion_focus_noMHC<-fusion_focus[!(fusion_focus$CHR == 6 & fusion_focus$P1 > 26e
 # Subset those which are high confidence
 fusion_focus_highConf<-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T & fusion_focus_noMHC$FOCUS_pip > 0.5 & fusion_focus_noMHC$TWAS.P < 3.685926e-08,]
 
-# One high confidence gene is novel (TMEM106B)
-
 # Subset transcriptom-wide significant that colocalised and pip > 0.5
 fusion_focus_TWsig<-fusion_focus_noMHC[fusion_focus_noMHC$TWAS.P < 1.368572e-06,]
 
@@ -1577,6 +1575,8 @@ fusion_focus_TWsig<-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T & fus
 
 write.csv(fusion_focus,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_sig_FOCUS_results.csv', row.names=F, quote=F)
 write.csv(focus,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv', row.names=F, quote=F)
+write.csv(fusion_focus_TWsig,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.TWSig_PIP5.csv', row.names=F, quote=F)
+write.csv(fusion_focus_highConf,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_HighConf_results.csv', row.names=F, quote=F)
 
 ```
 </details>
@@ -1587,6 +1587,26 @@ res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS
 
 library(knitr)
 kable(res, rownames = FALSE, caption='MDD TWAS Results with FOCUS', digits = 32)
+```
+
+</details>
+
+<details><summary>Show TW-significant results with PIP > 0.5</summary>
+```{R, echo=F, eval=T}
+res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.TWSig_PIP5.csv')
+
+library(knitr)
+kable(res, rownames = FALSE, caption='MDD TWAS:TW-significant results with PIP > 0.5', digits = 32)
+```
+
+</details>
+
+<details><summary>Show High-confidence associations results</summary>
+```{R, echo=F, eval=T}
+res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_HighConf_results.csv')
+
+library(knitr)
+kable(res, rownames = FALSE, caption='MDD TWAS: High confidence results', digits = 32)
 ```
 
 </details>
