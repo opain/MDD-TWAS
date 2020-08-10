@@ -904,6 +904,20 @@ twas$PANEL_clean &lt;- gsub(&#39;BA9&#39;, &#39;&#39;, twas$PANEL_clean)
 twas$PANEL_clean &lt;- gsub(&#39;BA24&#39;, &#39;&#39;, twas$PANEL_clean)
 twas$PANEL_clean &lt;- gsub(&#39;  &#39;, &#39; &#39;, twas$PANEL_clean)
 
+# Create a table showing the number of features tested for each SNP-weight set
+tab_ob&lt;-table(twas$PANEL_clean)
+panel_tab&lt;-data.frame(tab_ob)
+names(panel_tab)&lt;-c(&#39;PANEL&#39;,&#39;N_feat&#39;)
+
+tab_imp_ob&lt;-table(twas[!is.na(twas$TWAS.P),]$PANEL_clean)
+panel_imp_tab&lt;-data.frame(tab_imp_ob)
+names(panel_imp_tab)&lt;-c(&#39;PANEL&#39;,&#39;N_feat&#39;)
+
+panel_tab_all&lt;-merge(panel_tab, panel_imp_tab, by=&#39;PANEL&#39;)
+names(panel_tab_all)&lt;-c(&#39;PANEL&#39;,&#39;N_feat&#39;,&#39;N_feat_imp&#39;)
+
+write.csv(panel_tab_all, file = &quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_Panel_N.csv&quot;, row.names = F)
+
 # Shorten panel name to plot easily
 twas$PANEL_clean_short&lt;-substr(twas$PANEL_clean, start = 1, stop = 25)  #start the name at the first character and stop at the 25th
 twas$PANEL_clean_short[nchar(twas$PANEL_clean) &gt; 25]&lt;-paste0(twas$PANEL_clean_short[nchar(twas$PANEL_clean) &gt; 25], &quot;...&quot;)
@@ -2372,6 +2386,126 @@ twas_sign_final</code></pre>
 <td align="left">GTEx Cerebellum</td>
 <td align="right">5.729100</td>
 <td align="right">1.01e-08</td>
+</tr>
+</tbody>
+</table>
+</details>
+<details>
+<p><summary>Show number of features for each panel</summary></p>
+<table>
+<caption>Number of features for each panel</caption>
+<thead>
+<tr class="header">
+<th align="left">PANEL</th>
+<th align="right">N_feat</th>
+<th align="right">N_feat_imp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">CMC DLPFC</td>
+<td align="right">5419</td>
+<td align="right">5382</td>
+</tr>
+<tr class="even">
+<td align="left">CMC DLPFC Splicing</td>
+<td align="right">7771</td>
+<td align="right">7728</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx ACC</td>
+<td align="right">2709</td>
+<td align="right">2674</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Adrenal Gland</td>
+<td align="right">4520</td>
+<td align="right">4483</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx Amygdala</td>
+<td align="right">1836</td>
+<td align="right">1810</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Caudate</td>
+<td align="right">3660</td>
+<td align="right">3617</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx Cerebellar Hemisphere</td>
+<td align="right">4407</td>
+<td align="right">4361</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Cerebellum</td>
+<td align="right">5854</td>
+<td align="right">5803</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx Cortex</td>
+<td align="right">4011</td>
+<td align="right">3966</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Frontal Cortex</td>
+<td align="right">3143</td>
+<td align="right">3112</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx Hippocampus</td>
+<td align="right">2294</td>
+<td align="right">2269</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Hypothalamus</td>
+<td align="right">2314</td>
+<td align="right">2290</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx Nucleus accumbens</td>
+<td align="right">3239</td>
+<td align="right">3209</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Pituitary</td>
+<td align="right">4401</td>
+<td align="right">4353</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx Putamen</td>
+<td align="right">2817</td>
+<td align="right">2784</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Substantia nigra</td>
+<td align="right">1603</td>
+<td align="right">1582</td>
+</tr>
+<tr class="odd">
+<td align="left">GTEx Thyroid</td>
+<td align="right">9825</td>
+<td align="right">9731</td>
+</tr>
+<tr class="even">
+<td align="left">GTEx Whole Blood</td>
+<td align="right">6006</td>
+<td align="right">5948</td>
+</tr>
+<tr class="odd">
+<td align="left">NTR Blood</td>
+<td align="right">2454</td>
+<td align="right">2439</td>
+</tr>
+<tr class="even">
+<td align="left">PsychENCODE</td>
+<td align="right">14750</td>
+<td align="right">13522</td>
+</tr>
+<tr class="odd">
+<td align="left">YFS Blood</td>
+<td align="right">4700</td>
+<td align="right">4657</td>
 </tr>
 </tbody>
 </table>
@@ -5605,6 +5739,8 @@ for(i in unique(report$CHR)){
     if(dim(margin_i)[1] &gt; 0){
       loc_k_margin&lt;-loc_k[(loc_k$WGT %in% margin_i$WGT),]
       margin_res&lt;-rbind(margin_res,loc_k_margin)
+    } else {
+      loc_k_margin&lt;-data.frame(ID=NULL)
     }
     
     g_list&lt;-NULL
@@ -5780,7 +5916,7 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 <td align="right">3</td>
 <td align="left">43487406-45561063</td>
 <td align="left">ZNF445 (CMC DLPFC)</td>
-<td align="left">EP300 (GTEx Cerebellum, YFS Blood), XPNPEP3 (GTEx Frontal Cortex, CMC DLPFC), SLC25A17 (GTEx Nucleus accumbens, GTEx Thyroid), RANGAP1 (CMC DLPFC Splicing, PsychENCODE)</td>
+<td align="left">-</td>
 <td align="right">3.34e-07</td>
 <td align="right">6.34e-08</td>
 <td align="left">74.7%</td>
@@ -5978,7 +6114,7 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 <td align="right">16</td>
 <td align="left">71147494-73210261</td>
 <td align="left">PMFBP1 (PsychENCODE)</td>
-<td align="left">RP11-73M18.8 (GTEx Amygdala), AL049840.1 (GTEx Cerebellum, GTEx Cortex), RP11-73M18.9 (GTEx Cortex, PsychENCODE), TRMT61A (CMC DLPFC, GTEx Whole Blood), RP11-600F24.2 (PsychENCODE), RP11-73M18.7 (PsychENCODE), RP11-73M18.6 (PsychENCODE), CKB (YFS Blood)</td>
+<td align="left">-</td>
 <td align="right">2.46e-07</td>
 <td align="right">3.35e-08</td>
 <td align="left">76.3%</td>
@@ -6014,7 +6150,7 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 <td align="right">20</td>
 <td align="left">46838019-48853908</td>
 <td align="left">DDX27 (CMC DLPFC)</td>
-<td align="left">SF3B1 (GTEx Hypothalamus)</td>
+<td align="left">-</td>
 <td align="right">1.32e-06</td>
 <td align="right">3.54e-06</td>
 <td align="left">91%</td>
@@ -6123,7 +6259,7 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 <td align="right">3</td>
 <td align="left">43487406-45561063</td>
 <td align="left">ZNF445 (CMC DLPFC)</td>
-<td align="right">8</td>
+<td align="right">0</td>
 <td align="right">3.34e-07</td>
 <td align="right">6.34e-08</td>
 <td align="left">74.7%</td>
@@ -6321,7 +6457,7 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 <td align="right">16</td>
 <td align="left">71147494-73210261</td>
 <td align="left">PMFBP1 (PsychENCODE)</td>
-<td align="right">11</td>
+<td align="right">0</td>
 <td align="right">2.46e-07</td>
 <td align="right">3.35e-08</td>
 <td align="left">76.3%</td>
@@ -6357,7 +6493,7 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 <td align="right">20</td>
 <td align="left">46838019-48853908</td>
 <td align="left">DDX27 (CMC DLPFC)</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">1.32e-06</td>
 <td align="right">3.54e-06</td>
 <td align="left">91%</td>
@@ -8644,6 +8780,72 @@ fusion_focus&lt;-fusion_focus[,c(&#39;Location&#39;,&#39;SNP-weight Set&#39;,&#3
 
 write.csv(fusion_focus,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_sig_FOCUS_results.csv&#39;, row.names=F, quote=F)
 write.csv(focus,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv&#39;, row.names=F, quote=F)</code></pre>
+</details>
+<details>
+<p><summary>Investigate FANCL locus</summary></p>
+<pre class="bash"><code># The FANCL gene is considered twice in the FOCUS analysis. Why? It is likely due to multiple independent SNP associations in that region. This may be genuine or due to complex LD structure.
+
+######
+# Estimate LD for this locus.
+######
+
+# Calculate LD
+/users/k1806347/brc_scratch/Software/plink1.9.sh \
+--bfile /mnt/lustre/groups/biomarkers-brc-mh/TWAS_resource/FUSION/LDREF/1000G.EUR.2 \
+--r2 square \
+--chr 2 \
+--write-snplist \
+--from-bp 57429100 \
+--to-bp 60292000 \
+--out /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD
+
+# Plot LD
+module add apps/R
+R
+
+library(data.table)
+ld&lt;-as.matrix(fread(&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD.ld&#39;))
+snps&lt;-read.table(&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD.snplist&#39;)$V1
+
+dimnames(ld)&lt;-list(snps,snps)
+
+ld_melt&lt;-melt(ld)
+
+library(ggplot2)
+
+ggplot(data = ld_melt, aes(Var1, Var2, fill = value))+
+  geom_tile() +
+  scale_fill_gradient(low = &quot;white&quot;, high = &quot;red&quot;)
+
+# The r2 patterns don&#39;t look strange. There is no long range LD.
+
+######
+# Perform LD clumping in this locus as well.
+######
+
+/users/k1806347/brc_scratch/Software/plink1.9.sh \
+--bfile /mnt/lustre/groups/biomarkers-brc-mh/TWAS_resource/FUSION/LDREF/1000G.EUR.2 \
+--chr 2 \
+--from-bp 57429100 \
+--to-bp 60292000 \
+--clump /users/k1806347/brc_scratch/Data/GWAS_sumstats/Lorenza/DEPR01_BP \
+--clump-p1 5e-6 \
+--clump-p2 1 \
+--clump-kb 250 \
+--clump-r2 0.2 \
+--out /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD_clump
+
+./plink --bfile mydata
+        --clump myresults-a.assoc,myresults-b.assoc 
+        --clump-best
+        --clump-replicate
+        --clump-index-first
+        --clump-allow-overlap
+        --clump-p1 1e-4 
+        --clump-p2 1
+        --clump-kb 250 
+        --clump-r2 0.2
+</code></pre>
 </details>
 <details>
 <p><summary>Combine FOCUS results with novelty table</summary></p>

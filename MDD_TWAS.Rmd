@@ -429,6 +429,20 @@ twas$PANEL_clean <- gsub('BA9', '', twas$PANEL_clean)
 twas$PANEL_clean <- gsub('BA24', '', twas$PANEL_clean)
 twas$PANEL_clean <- gsub('  ', ' ', twas$PANEL_clean)
 
+# Create a table showing the number of features tested for each SNP-weight set
+tab_ob<-table(twas$PANEL_clean)
+panel_tab<-data.frame(tab_ob)
+names(panel_tab)<-c('PANEL','N_feat')
+
+tab_imp_ob<-table(twas[!is.na(twas$TWAS.P),]$PANEL_clean)
+panel_imp_tab<-data.frame(tab_imp_ob)
+names(panel_imp_tab)<-c('PANEL','N_feat')
+
+panel_tab_all<-merge(panel_tab, panel_imp_tab, by='PANEL')
+names(panel_tab_all)<-c('PANEL','N_feat','N_feat_imp')
+
+write.csv(panel_tab_all, file = "/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_Panel_N.csv", row.names = F)
+
 # Shorten panel name to plot easily
 twas$PANEL_clean_short<-substr(twas$PANEL_clean, start = 1, stop = 25)  #start the name at the first character and stop at the 25th
 twas$PANEL_clean_short[nchar(twas$PANEL_clean) > 25]<-paste0(twas$PANEL_clean_short[nchar(twas$PANEL_clean) > 25], "...")
@@ -662,6 +676,16 @@ res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_
 
 library(knitr)
 kable(res, rownames = FALSE, caption='Transcriptome-wide significant associations with Major Depression', digits = 32)
+```
+
+</details>
+
+<details><summary>Show number of features for each panel</summary>
+```{R, echo=F, eval=T}
+res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_Panel_N.csv')
+
+library(knitr)
+kable(res, rownames = FALSE, caption='Number of features for each panel', digits = 32)
 ```
 
 </details>
@@ -1273,6 +1297,8 @@ for(i in unique(report$CHR)){
     if(dim(margin_i)[1] > 0){
       loc_k_margin<-loc_k[(loc_k$WGT %in% margin_i$WGT),]
       margin_res<-rbind(margin_res,loc_k_margin)
+    } else {
+      loc_k_margin<-data.frame(ID=NULL)
     }
     
     g_list<-NULL
@@ -1542,6 +1568,75 @@ write.csv(focus,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TW
 
 ```
 </details>
+
+<details><summary>Investigate FANCL locus</summary>
+```{bash, eval=F, echo=T}
+# The FANCL gene is considered twice in the FOCUS analysis. Why? It is likely due to multiple independent SNP associations in that region. This may be genuine or due to complex LD structure.
+
+######
+# Estimate LD for this locus.
+######
+
+# Calculate LD
+/users/k1806347/brc_scratch/Software/plink1.9.sh \
+--bfile /mnt/lustre/groups/biomarkers-brc-mh/TWAS_resource/FUSION/LDREF/1000G.EUR.2 \
+--r2 square \
+--chr 2 \
+--write-snplist \
+--from-bp 57429100 \
+--to-bp 60292000 \
+--out /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD
+
+# Plot LD
+module add apps/R
+R
+
+library(data.table)
+ld<-as.matrix(fread('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD.ld'))
+snps<-read.table('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD.snplist')$V1
+
+dimnames(ld)<-list(snps,snps)
+
+ld_melt<-melt(ld)
+
+library(ggplot2)
+
+ggplot(data = ld_melt, aes(Var1, Var2, fill = value))+
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red")
+
+# The r2 patterns don't look strange. There is no long range LD.
+
+######
+# Perform LD clumping in this locus as well.
+######
+
+/users/k1806347/brc_scratch/Software/plink1.9.sh \
+--bfile /mnt/lustre/groups/biomarkers-brc-mh/TWAS_resource/FUSION/LDREF/1000G.EUR.2 \
+--chr 2 \
+--from-bp 57429100 \
+--to-bp 60292000 \
+--clump /users/k1806347/brc_scratch/Data/GWAS_sumstats/Lorenza/DEPR01_BP \
+--clump-p1 5e-6 \
+--clump-p2 1 \
+--clump-kb 250 \
+--clump-r2 0.2 \
+--out /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/FANCL_region_LD_clump
+
+./plink --bfile mydata
+        --clump myresults-a.assoc,myresults-b.assoc 
+        --clump-best
+        --clump-replicate
+        --clump-index-first
+        --clump-allow-overlap
+        --clump-p1 1e-4 
+        --clump-p2 1
+        --clump-kb 250 
+        --clump-r2 0.2
+
+```
+</details>
+
 
 <details><summary>Combine FOCUS results with novelty table</summary>
 ```{R, eval=F, echo=T}
