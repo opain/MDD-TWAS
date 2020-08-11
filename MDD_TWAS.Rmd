@@ -1377,7 +1377,7 @@ dim(joint_res[(2*pnorm(-abs(joint_res$BEST.GWAS.Z)) < 5e-8 & joint_res$TOP.SNP.C
 # Check number of novel associations which colocalise
 dim(gene_res[(2*pnorm(-abs(gene_res$BEST.GWAS.Z)) < 5e-8 & gene_res$TOP.SNP.COR^2 < 0.1 & gene_res$Colocalised == T) | (2*pnorm(-abs(gene_res$BEST.GWAS.Z)) > 5e-8 & gene_res$Colocalised == T),]) # 45
 
-gene_res<-gene_res[,c('CHR','BP','ID','PANEL_clean','WGT','TWAS.P','BEST.GWAS.P','TOP.SNP.COR','Type','Novel','COLOC.PP3','COLOC.PP4','Colocalised')]
+gene_res<-gene_res[,c('CHR','BP','P0','P1','ID','PANEL_clean','WGT','TWAS.Z','TWAS.P','BEST.GWAS.P','TOP.SNP.COR','Type','Novel','COLOC.PP3','COLOC.PP4','Colocalised')]
 
 # Save table showing whether gene associations are novel
 write.csv(gene_res,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Conditional/MDD_TWAS_Conditional_table_novelty.csv', row.names=F, quote=T)
@@ -1637,7 +1637,6 @@ ggplot(data = ld_melt, aes(Var1, Var2, fill = value))+
 ```
 </details>
 
-
 <details><summary>Combine FOCUS results with novelty table</summary>
 ```{R, eval=F, echo=T}
 library(data.table)
@@ -1666,11 +1665,19 @@ fusion_focus_TWsig[(fusion_focus_TWsig$WGT %in% fusion_focus_TWsig$WGT[duplicate
 # The FANCL feature is duplicated due to FOCUS defining two nearby regions of association. A splice variant of FANCL is in the credible set for one region but not the other.
 
 # Subset transcriptom-wide significant that colocalised and pip > 0.5
-fusion_focus_TWsig<-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T & fusion_focus_noMHC$FOCUS_pip > 0.5 & fusion_focus_noMHC$TWAS.P < 1.368572e-06,]
+fusion_focus_TWsig_coloc<-fusion_focus_noMHC[fusion_focus_noMHC$Colocalised == T & fusion_focus_noMHC$FOCUS_pip > 0.5 & fusion_focus_noMHC$TWAS.P < 1.368572e-06,]
+dim(fusion_focus_TWsig_coloc)[1] # 11
+length(unique(fusion_focus_TWsig_coloc$ID)) #11
+
+# Subset transcriptom-wide significant with pip > 0.5
+fusion_focus_TWsig<-fusion_focus_noMHC[fusion_focus_noMHC$FOCUS_pip > 0.5 & fusion_focus_noMHC$TWAS.P < 1.368572e-06,]
+dim(fusion_focus_TWsig)[1] # 23
+length(unique(fusion_focus_TWsig$ID)) # 23
 
 write.csv(fusion_focus,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_sig_FOCUS_results.csv', row.names=F, quote=F)
 write.csv(focus,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.csv', row.names=F, quote=F)
 write.csv(fusion_focus_TWsig,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.TWSig_PIP5.csv', row.names=F, quote=F)
+write.csv(fusion_focus_TWsig_coloc,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.TWSig_coloc_PIP5.csv', row.names=F, quote=F)
 write.csv(fusion_focus_highConf,'/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_HighConf_results.csv', row.names=F, quote=F)
 
 ```
@@ -1692,6 +1699,16 @@ res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS
 
 library(knitr)
 kable(res, rownames = FALSE, caption='MDD TWAS:TW-significant results with PIP > 0.5', digits = 32)
+```
+
+</details>
+
+<details><summary>Show TW-significant results with COLOC PP4 > 0.8 and PIP > 0.5</summary>
+```{R, echo=F, eval=T}
+res<-read.csv('/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/FOCUS/MDD_TWAS_FOCUS_results.TWSig_coloc_PIP5.csv')
+
+library(knitr)
+kable(res, rownames = FALSE, caption='MDD TWAS:TW-significant results with COLOC PP4 > 0.8 and PIP > 0.5', digits = 32)
 ```
 
 </details>
