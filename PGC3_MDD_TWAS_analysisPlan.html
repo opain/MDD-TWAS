@@ -387,101 +387,13 @@ pre code, pre, code {
 </style>
 <hr />
 <p>This document is an analysis plan for the Transcriptome-wide Association Study (TWAS) component of the Psychiatric Genomics Consortium 3 (PGC-3) Major Depressive Disorder (MDD) study.</p>
-<p>The TWAS field is developing constantly, with new software and reference data being released regularly.</p>
-<p>I would suggest the following:</p>
-<ul>
-<li>Software
-<ul>
-<li>FUSION/TWAS
-<ul>
-<li>Uses HapMap3 variants only improve overlap with GWAS</li>
-<li>Uses multiple models to derive SNP-weights</li>
-<li>In-built conditional analysis and colocalisation</li>
-</ul></li>
-<li>FOCUS
-<ul>
-<li>TWAS-finemapping software</li>
-<li>Used in combination with standard TWAS software</li>
-</ul></li>
-</ul></li>
-<li>SNP-weights
-<ul>
-<li>Brain
-<ul>
-<li>Post-natal
-<ul>
-<li>GTEx v7 - Gene level
-<ul>
-<li>Amygdala</li>
-<li>Anterior_cingulate_cortex_BA24</li>
-<li>Caudate_basal_ganglia</li>
-<li>Cerebellar_Hemisphere</li>
-<li>Cerebellum</li>
-<li>Cortex</li>
-<li>Frontal_Cortex_BA9</li>
-<li>Hippocampus</li>
-<li>Hypothalamus</li>
-<li>Nucleus_accumbens_basal_ganglia</li>
-<li>Putamen_basal_ganglia</li>
-<li>Substantia_nigra</li>
-</ul></li>
-<li>CommonMind Consoritum (CMC) Dorsolateral prefrontal cortex
-<ul>
-<li>Gene-level and splice variants</li>
-</ul></li>
-<li>PsychENCODE frontal and temporal cerebral cortices
-<ul>
-<li>Transcript-level</li>
-</ul></li>
-</ul></li>
-<li>Pre-natal
-<ul>
-<li>O’Brien et al Foetal brain expression
-<ul>
-<li>Gene- and transcript-level</li>
-</ul></li>
-</ul></li>
-</ul></li>
-<li>Other potentially disease relevent tissues
-<ul>
-<li>GTEx
-<ul>
-<li>Adrenal_Gland</li>
-<li>Pituitary</li>
-<li>Thyroid</li>
-</ul></li>
-</ul></li>
-<li>Blood - Proxy to disease relevant tissues
-<ul>
-<li>GTEx</li>
-<li>Netherlands Twin registry</li>
-<li>Young Finns Study</li>
-</ul></li>
-</ul></li>
-<li>Significance threshold
-<ul>
-<li>Estimate using permtuation procedure
-<ul>
-<li>The same process that was used to estimate genome-wide significance, except without extrapolating to infinite coverage of transcriptome. TWAS is performed 1,000 times for a random phenotype using the SNP-weights considered in the study, recording the minimum p-value identified for each null TWAS. The 5% quantile of minimum p-values is then calculated to determine the transcriptome-wide significance threshold, as only 1/20 observations under this threshold will occu by chance. This approach accounts for the correlation between genes and the correlation between features representing the same gene across tissues.</li>
-</ul></li>
-<li>Alternative: Bonferroni correction for number of features tested
-<ul>
-<li>This approach is highly conservative as it does not account for the correlation between genes, and features representing the same gene across tissues.</li>
-</ul></li>
-</ul></li>
-<li>TWAS-based Gene-set/-property enrichment
-<ul>
-<li>Software: TWAS-GSEA
-<ul>
-<li>Similar to MAGMA but uses predicted expression correlation matrix to account for correlated features.</li>
-</ul></li>
-<li>Run analysis across all SNP-weight panels, within tissue groups (postnatal brain, HPA, HPT, Blood), with tissue specific</li>
-<li>Hypothesis-free gene-ontology sets</li>
-<li>Brainspan developmental stage enrichment</li>
-<li>Use Bonferroni multiple testing correction</li>
-</ul></li>
-</ul>
-<p>Possible alternatives: * Don’t perform TWAS-GSEA * It’s not very well powered * Hasn’t found anything very interesting in previous applications so far * Use only FOCUS to TWAS-finemap GWAS significant loci * Use MetaXcan instead of FUSION * Has advantage of using GTEx v8 with splicing variants * They seem to be addi * Limitations: * More liable to poor overlap between GWAS and gene expression SNP-weights though new imputation recommendations have been released * I have less experience with this * No conditional analysis option I think</p>
+<p>The TWAS field is developing constantly, with new software and reference data being released regularly. My recommendations are broadly consistent with our recent MDD TWAS using Wray et al sumstats. A preprint is <a href="https://www.biorxiv.org/content/10.1101/2020.03.24.004903v1">here</a>, and a more recent version can be sent upon request.</p>
+<p>I would suggest the following we perform the TWAS using <a href="http://gusevlab.org/projects/fusion/">FUSION</a> software and a range of SNP-weight sets derived from brain, HPA and HPT axis tissues and blood. Although Blood is unlikely to be causal it can act as a proxy for other tissues but results should interpreted carefully. For brain tissues we can use PsychENCODE, CommonMind consoritium and GTEx references. Although CommonMind is within PsychENCODE, PsychENCODE SNP-weights were derived in a slightly different way to CommonMind which means I think they are both useful. For HPA and HPT axis tissues we can use GTEx data. And for Blood tissue we can use the Young Finns Study, Netherlands Twin registry and GTEx. Except PsychENCODE, all these SNP-weights were derived by FUSION authors and are avialable on the FUSION website. PsychENCODE SNP-weights are from the <a href="http://resource.psychencode.org/">PsychENCODE</a> website which I have downloaded and formatted as required already.</p>
+<p>I would suggest using a permutation procedure to estimate the study-specific transcriptome-wide significance threshold. This approach is similar to how genome-wide significance was calculated. More information in supplement of my ASD TWAS paper <a href="https://www.biologicalpsychiatryjournal.com/article/S0006-3223(19)31334-4/abstract">more info</a>. It accounts for the correlation between nearby genes within the same SNP-weight set (e.g. PsychENCODE), and it accounts for the correlation between features representing the same gene across SNP-weight sets (e.g. NEGR1 GTEx, NEGR1 PsychENCODE). The alternative is Bonferroni correction which is highly conservative by assuming all features are independent.</p>
+<p>An important part of TWAS is distinguishing linkage from pleiotropy as this helps to confirm that gene expression differences will really occur in the depression cases. Colocalisation is the main approach used for this, and is performed within the FUSION software using the <a href="https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1004383">coloc</a> package. A limitation of this method is that it assumes a single causal variant underlies the association with both outcomes, which is inconsistent with the idea of TWAS which gains power by considering multiple eQTL effects for each gene. Another useful analysis to confirm pleiotropy, is software called <a href="https://www.nature.com/articles/s41588-019-0367-1">FOCUS</a>. FOCUS performs statistical finemapping of TWAS associations, providing PIP estimates of causality, and 90% credible sets. This analysis helps identify TWAS associations that colocalise with the GWAS phenotype (same causal variant) and helps idenitfy which gene/s are most likely causal within a locus. This is useful as there are often peaks of genes associated in TWAS, and sometime multiple genes colocalise.</p>
+<p>People often want to test for gene-set enrichment withint he TWAS results. In the past I have used software that I wrote called <a href="https://github.com/opain/TWAS-GSEA/blob/master/TWAS-GSEA.V1.2.R">TWAS-GSEA</a>, which is similar to MAGMA in that it tests for enrichment using a linear mixed model with a gene-gene correlation matrix to account for the non-independence of nearby genes due to LD. However, a new method has been released called <a href="https://www.nature.com/articles/s41588-020-0625-2">MESC</a> which I think is better as it distinguishes phenotypic variance mediated by cis-regulated expression, as opposed to linkage or pleitropy. Furthermore, this approach allows estimation of total phenotypic variance mediated by cis-regulated expression which may be of interest.</p>
+<p>Lastly, it is nice to compare TWAS results with results from observed gene expression. We can do this using the largest depression gene expression study to date by <a href="https://pubmed.ncbi.nlm.nih.gov/26008736/">Jansen et al</a> using the netherlands twin registry.</p>
+<p>Apart from MESC, I have performed all of the above analyses before and interpreted the results.</p>
 <hr />
 
 
