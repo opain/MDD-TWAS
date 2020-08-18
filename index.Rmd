@@ -16,7 +16,7 @@ This website will provide details of a project inferring differential gene expre
 
 #### Contents:
 
-* [Dall'Aglio, Lewis, Pain: Delineating the Genetic Component of Gene Expression in Major Depression](https://opain.github.io/MDD-TWAS/MDD_TWAS.html)
+* [Dall'Aglio, Lewis, Pain: Delineating the Genetic Component of Gene Expression in Major Depression](MDD_TWAS.html)
 
 ***
 
