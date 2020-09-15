@@ -2284,34 +2284,37 @@ cp /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS-GSEA/ByPanel/MDD_TWAS
 
 # Comparison with previous literature
 
-Lorenza has prepared results files of previous studies for this comparison.
+Results files of the previous studies used for this comparison were obtained from the supplementary tables of each study.
 
 ***
 
 ## TWAS literature
+Our study results were compared with Wray et al. (2018), Gaspar et al. (2019), and Gerring et al. (2019)
 
 <details><summary>Show code</summary>
 ```{R, eval=F, echo=T}
 ########################################
 # Comparing our results to previous TWASs
 ###############################################
-# our TWAS, Wray et al TWAS, Gaspar et al. TWAS
+# our TWAS, Wray et al TWAS, Gaspar et al. TWAS, Gerring et al. (2019)
+
 ###
 # Load data
 ###
 library(data.table)
-#these are all files with significant features only. NB the Gaspar file includes findings from all snp weights from any 
-#gene sign. in at least one tissue
-our_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_CLEAN.txt")
-our_hits_sign <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_TWSig_CLEAN.txt")
-Gaspar_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Gaspar\ et\ al.\ hits.csv")
-Wray_hits <- fread("/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Wray\ et\ al.\ hits.csv")
+
+#these are all files with significant features only (except for our results)
+our_hits <- fread("C:/Users/loryd/Desktop/MSc dissertation/findings/raw findings/AllTissues_CLEAN.txt")
+our_hits_sign <- fread("C:/Users/loryd/Desktop/MSc dissertation/findings/raw findings/signtest.AllTissues_CLEAN.txt")
+Gaspar_hits <- fread("C:/Users/loryd/Desktop/MSc dissertation/mock data/Gaspar et al. hits.txt")
+Wray_hits <- fread("C:/Users/loryd/Desktop/MSc dissertation/mock data/Wray et al. hits.csv")
+Gerring_hits <- fread("C:/Users/loryd/Desktop/MSc dissertation/mock data/Gerring et al. hits.csv")
 
 ###
 # Structure df so that they are similar
 ###
 
-#1. GASPAR (NB this includes info on TWAS.Z values not p values!!!)
+#1. GASPAR (NB this includes info on TWAS.Z values not p values)
 #melt the gaspar hits df so that it presents one column with all SNP-weigths and one with the values
 Gaspar_hits2 <- melt(Gaspar_hits, id = c("target", "CHROMOSOME"))
 head(Gaspar_hits2)
@@ -2320,30 +2323,22 @@ head(Gaspar_hits2)
 Gaspar_hits2$PANEL <- Gaspar_hits2$variable
 Gaspar_hits2$TWAS.Z <- Gaspar_hits2$value
 
-Gaspar_hits2$variable <- NULL
-Gaspar_hits2$value <- NULL
-
 #2. Wray et al 
-
 #keep panel, ID, and TWAS.P & TWAS.Z info only 
 library(tidyverse)
 Wray_hits <- as_tibble(Wray_hits)
 Wray_hits
 Wray_hits_filt <- Wray_hits %>% select("Gene", "CHR", "TWAS.Z", "TWAS.P")
 
+#3. Gerring et al. 
+#the gene needs to be called ID so that we can merge based on that. Filter for the columns needed
+Gerring_hits$ID <- Gerring_hits$GENE
+Gerring_hits <- as_tibble(Gerring_hits)
+Gerring_hits_filt <- Gerring_hits %>% select ('ID', 'ZSTAT', 'P')
 
 #ALL
 #rename columns so they all correspond 
-Gaspar_hits2$ID <- Gaspar_hits2$target
-Gaspar_hits2$CHR <- Gaspar_hits2$CHROMOSOME
-str(Gaspar_hits2)
-
-Gaspar_hits2$target <- NULL
-Gaspar_hits2$CHROMOSOME <- NULL
-
 Wray_hits_filt$ID <- Wray_hits_filt$Gene
-Wray_hits_filt$Gene <- NULL
-
 
 #filter our findings for the  cols needed only 
 our_hits <- as_tibble(our_hits)
@@ -2353,57 +2348,59 @@ our_hits_filt <- our_hits %>% select("PANEL", "PANEL_clean_short", "ID", "CHR", 
 ###
 # Fix SNP-weights 
 ###
-#No need for this
-#Wray_hits_filt$PANEL_Wray <- "CMC DLPFC"
-#our_hits_filt$PANEL_DallAglio <- our_hits_filt$PANEL_clean_short
-#Gaspar_hits2$PANEL_Gaspar <- Gaspar_hits2$PANEL_Gaspar
 
 ###
 # Filter our findings for any gene significant in either study 
 ###
-
+str(our_hits_sign)
 sign_genes_our <- our_hits_sign$ID
+str(sign_genes_our)
 sign_genes_Wray <- Wray_hits_filt$ID
-sign_genes_Gaspar <- Gaspar_hits2$ID
+str(sign_genes_Wray)
 
-Gaspar <- unique(sign_genes_Gaspar)
-length(Gaspar) #25 unique genes
-Wray <- unique(sign_genes_Wray)
-length(Wray) #17 unique genes
-Us <- unique(sign_genes_our)
-length(Us) #94 unique genes 
+Gaspar_hits2$ID <- Gaspar_hits2$target
+Gaspar_hits2<-Gaspar_hits2[!is.na(Gaspar_hits2$TWAS.Z),]
+sign_genes_Gaspar <- Gaspar_hits2$ID
+str(sign_genes_Gaspar)
+
+sign_genes_Gerring <- Gerring_hits_filt$ID
+
+Gaspar <- unique(sign_genes_Gaspar) #25 unique genes
+Wray <- unique(sign_genes_Wray) #17 unique genes
+Us <- unique(sign_genes_our) #91 unique genes 
+Gerring <- unique(sign_genes_Gerring) #57 unique genes
 
 #create a general variable with all sign. genes in any paper
-All <- c(Gaspar, Wray, Us)
-length(All) #136 features
+All <- c(Gaspar, Wray, Us, Gerring)
+All #190 genes - from any of the examined publications (i.e. there might still be some duplicates, across studies)
 
 #keep only unique gene IDs
 All_unique <- unique(All)
-length(All_unique) #108 genes
+All_unique #133 unique genes considered as significant across all examined publications 
+
 
 ###
 #Keep only genes sign, in either of the three studies
 ###
 
 #filter by genes which are in the vector containing sign. features in any of the studies
-our_hits_final <- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  
-dim(our_hits_final)[1] #675 observations
+our_hits_final <- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  #817 observations
 
-#keep only unique genes in our study (those with the greatest absolute z-score)
+#keep only unique genes (those with the greatest absolute z-score)
+#to do so, after excluding for missing values, you order genes by z-scores (decreasing order) and keep only unique values
+#since you ordered from the largest z-scores, the genes with the largest z-scores will be kept and their duplicates, with lower
+# z-scores, discarded. 
 our_hits_final<-our_hits_final[!is.na(our_hits_final$TWAS.Z),]
 our_hits_final2 <- our_hits_final[order(abs(our_hits_final$TWAS.Z), decreasing = T), ]
 library(dplyr)
-our_hits_final3  <- our_hits_final2 %>% distinct(ID, .keep_all = T)
-dim(our_hits_final3)[1] #107 obs.
+our_hits_final3  <- our_hits_final2 %>% distinct(ID, .keep_all = T) #125 obs.
 
 our_hits_correct <- our_hits_final3
 
-#keep only unique genes in the Gaspar et al study 
+#keep only unique genes in the Gaspar et al study (different snp-weight sets were tested)
 Gaspar_hits2b<-Gaspar_hits2[!is.na(Gaspar_hits2$TWAS.Z),]
 Gaspar_hits3 <- Gaspar_hits2b[order(abs(Gaspar_hits2b$TWAS.Z), decreasing = T), ]
-library(dplyr)
-Gaspar_hits4  <- Gaspar_hits3 %>% distinct(ID, .keep_all = T)
-dim(Gaspar_hits4)[1] #25 gene IDs 
+Gaspar_hits4  <- Gaspar_hits3 %>% distinct(target, .keep_all = T) #25 gene IDs, as expected 
 
 Gaspar_correct <- Gaspar_hits4
 
@@ -2412,15 +2409,22 @@ Gaspar_correct <- Gaspar_hits4
 Wray_hits_correct <- Wray_hits_filt[!is.na(Wray_hits_filt$TWAS.Z), ] 
 Wray_hits_correct
 
+#keep only unique genes in the Gerring et al. study (different snp-weight sets were tested)
+Gerring_hits_filt2<-Gerring_hits_filt[!is.na(Gerring_hits_filt$ZSTAT),]
+Gerring_hits_filt3 <- Gerring_hits_filt2[order(abs(Gerring_hits_filt2$ZSTAT), decreasing = T), ]
+Gerring_correct <- Gerring_hits_filt3 %>% distinct(ID, .keep_all = T) #57 genes
+
 ###
 # Change the names of variables which have the same col name but distinct values across the three df
 ###
-
 Gaspar_correct$Gaspar_TWAS.Z <- Gaspar_correct$TWAS.Z
 Gaspar_correct$TWAS.Z <- NULL
 
 Wray_hits_correct$Wray_TWAS.Z <- Wray_hits_correct$TWAS.Z
 Wray_hits_correct$TWAS.Z <- NULL
+
+Gerring_correct$Gerring_TWAS.Z <- Gerring_correct$ZSTAT
+Gerring_correct$ZSTAT <- NULL
 
 Wray_hits_correct$Wray_TWAS.P <- Wray_hits_correct$TWAS.P
 Wray_hits_correct$TWAS.P <- NULL
@@ -2433,54 +2437,52 @@ our_hits_correct$TWAS.P <- NULL
 our_hits_correct$PANEL <- NULL
 our_hits_correct$PANEL_clean_short <- NULL
 
+
 Wray_hits_correct$CHR <- NULL
 Wray_hits_correct$Wray_TWAS.P <- NULL
 Wray_hits_correct$TWAS.P <- NULL
 
-Gaspar_correct$CHR <- NULL
 Gaspar_correct$PANEL <- NULL
+
 
 ###
 #join your hits with the hits from the wray et al. paper and Gaspar et al paper
 ###
 #since the three tibbles do not have the same nrow, we cannot use merge. But we can use full_join
 
-Gaspar_correct <- as_tibble(Gaspar_correct) #transform all df into tibbles to use full join. the other two
+Gaspar_correct <- as_tibble(Gaspar_correct) #transform all df into tibbles to use full join. the other 3
 ##df are already tibbles. this was the only one left to convert
 
+
 #join hits bw Gaspar and our study
-table_correct<- full_join(our_hits_correct, Gaspar_correct)
-dim(table_correct)[1] # 108
+Gaspar_correct$ID <- Gaspar_correct$target
+table_correct<- full_join(our_hits_correct, Gaspar_correct) #dim 129, 10
 
 #merge the newly created table with the wray et al findings too
-table_correct2 <- full_join(table_correct, Wray_hits_correct)  #dim 108, 8 
-dim(table_correct2)[1] # 108
+table_correct2 <- full_join(table_correct, Wray_hits_correct)  #dim 129, 11
+
+#merge the newly created table with the Gerring et al. findings
+table_correct3 <- full_join(table_correct2, Gerring_correct) #dim 133, 13
 
 #check that no gene is repeated and that z-scores are present for the three studies (should be high z-scores)
-table_correct2 <- table_correct2[order(table_correct2$ID), ]
-table_correct2 #everything looks fine
+table_correct3 <- table_correct3[order(table_correct3$ID), ]
 
-#delete the Dall'Aglio TWAS.P col 
-table_correct2$DallAglio_TWAS.P <- NULL
-
-#add a column saying whether the gene was transcriptome-wide sign. in our study 
-table_correct2$Transcriptome_wide_sign_DallAglio <- ifelse(table_correct2$DallAglio_TWAS.Z > 4.83 | table_correct2$DallAglio_TWAS.Z < -4.83, "Sign.", "Not Sign.")
 
 ###
 # Clean up and save
 ###
 
-my_data <- as_data_frame(table_correct2)
+my_data <- as_data_frame(table_correct3)
 colnames(my_data)
 
-col_order <- c("ID", "Gaspar_TWAS.Z", "Wray_TWAS.Z", "DallAglio_TWAS.Z", "Transcriptome_wide_sign_DallAglio")
+col_order <- c("ID", "Gaspar_TWAS.Z", "Wray_TWAS.Z", "Gerring_TWAS.Z", "DallAglio_TWAS.Z", "Transcriptome_wide_sign_DallAglio")
 my_data2 <- my_data[, col_order]
 my_data2
 
 
 #save as csv file (each df col is treated as independent col, +excel format)
-write.csv(my_data2, '/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/comparison_previousTWASs.csv', row.names=F)
-my_data2
+write.csv(my_data2, 'C:/Users/loryd/Desktop/MSc dissertation/findings/table/comparison_previousTWASs.csv', row.names=F)
+
 
 ```
 </details>
