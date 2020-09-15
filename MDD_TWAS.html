@@ -13783,32 +13783,35 @@ dev.off()</code></pre>
 </div>
 <div id="comparison-with-previous-literature" class="section level1">
 <h1><span class="header-section-number">4</span> Comparison with previous literature</h1>
-<p>Lorenza has prepared results files of previous studies for this comparison.</p>
+<p>Results files of the previous studies used for this comparison were obtained from the supplementary tables of each study.</p>
 <hr />
 <div id="twas-literature" class="section level2">
 <h2><span class="header-section-number">4.1</span> TWAS literature</h2>
+<p>Our study results were compared with Wray et al. (2018), Gaspar et al. (2019), and Gerring et al. (2019)</p>
 <details>
 <p><summary>Show code</summary></p>
 <pre class="r"><code>########################################
 # Comparing our results to previous TWASs
 ###############################################
-# our TWAS, Wray et al TWAS, Gaspar et al. TWAS
+# our TWAS, Wray et al TWAS, Gaspar et al. TWAS, Gerring et al. (2019)
+
 ###
 # Load data
 ###
 library(data.table)
-#these are all files with significant features only. NB the Gaspar file includes findings from all snp weights from any 
-#gene sign. in at least one tissue
-our_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_CLEAN.txt&quot;)
-our_hits_sign &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS_AllTissues_TWSig_CLEAN.txt&quot;)
-Gaspar_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Gaspar\ et\ al.\ hits.csv&quot;)
-Wray_hits &lt;- fread(&quot;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/Wray\ et\ al.\ hits.csv&quot;)
+
+#these are all files with significant features only (except for our results)
+our_hits &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/findings/raw findings/AllTissues_CLEAN.txt&quot;)
+our_hits_sign &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/findings/raw findings/signtest.AllTissues_CLEAN.txt&quot;)
+Gaspar_hits &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/mock data/Gaspar et al. hits.txt&quot;)
+Wray_hits &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/mock data/Wray et al. hits.csv&quot;)
+Gerring_hits &lt;- fread(&quot;C:/Users/loryd/Desktop/MSc dissertation/mock data/Gerring et al. hits.csv&quot;)
 
 ###
 # Structure df so that they are similar
 ###
 
-#1. GASPAR (NB this includes info on TWAS.Z values not p values!!!)
+#1. GASPAR (NB this includes info on TWAS.Z values not p values)
 #melt the gaspar hits df so that it presents one column with all SNP-weigths and one with the values
 Gaspar_hits2 &lt;- melt(Gaspar_hits, id = c(&quot;target&quot;, &quot;CHROMOSOME&quot;))
 head(Gaspar_hits2)
@@ -13817,30 +13820,22 @@ head(Gaspar_hits2)
 Gaspar_hits2$PANEL &lt;- Gaspar_hits2$variable
 Gaspar_hits2$TWAS.Z &lt;- Gaspar_hits2$value
 
-Gaspar_hits2$variable &lt;- NULL
-Gaspar_hits2$value &lt;- NULL
-
 #2. Wray et al 
-
 #keep panel, ID, and TWAS.P &amp; TWAS.Z info only 
 library(tidyverse)
 Wray_hits &lt;- as_tibble(Wray_hits)
 Wray_hits
 Wray_hits_filt &lt;- Wray_hits %&gt;% select(&quot;Gene&quot;, &quot;CHR&quot;, &quot;TWAS.Z&quot;, &quot;TWAS.P&quot;)
 
+#3. Gerring et al. 
+#the gene needs to be called ID so that we can merge based on that. Filter for the columns needed
+Gerring_hits$ID &lt;- Gerring_hits$GENE
+Gerring_hits &lt;- as_tibble(Gerring_hits)
+Gerring_hits_filt &lt;- Gerring_hits %&gt;% select (&#39;ID&#39;, &#39;ZSTAT&#39;, &#39;P&#39;)
 
 #ALL
 #rename columns so they all correspond 
-Gaspar_hits2$ID &lt;- Gaspar_hits2$target
-Gaspar_hits2$CHR &lt;- Gaspar_hits2$CHROMOSOME
-str(Gaspar_hits2)
-
-Gaspar_hits2$target &lt;- NULL
-Gaspar_hits2$CHROMOSOME &lt;- NULL
-
 Wray_hits_filt$ID &lt;- Wray_hits_filt$Gene
-Wray_hits_filt$Gene &lt;- NULL
-
 
 #filter our findings for the  cols needed only 
 our_hits &lt;- as_tibble(our_hits)
@@ -13850,57 +13845,59 @@ our_hits_filt &lt;- our_hits %&gt;% select(&quot;PANEL&quot;, &quot;PANEL_clean_
 ###
 # Fix SNP-weights 
 ###
-#No need for this
-#Wray_hits_filt$PANEL_Wray &lt;- &quot;CMC DLPFC&quot;
-#our_hits_filt$PANEL_DallAglio &lt;- our_hits_filt$PANEL_clean_short
-#Gaspar_hits2$PANEL_Gaspar &lt;- Gaspar_hits2$PANEL_Gaspar
 
 ###
 # Filter our findings for any gene significant in either study 
 ###
-
+str(our_hits_sign)
 sign_genes_our &lt;- our_hits_sign$ID
+str(sign_genes_our)
 sign_genes_Wray &lt;- Wray_hits_filt$ID
-sign_genes_Gaspar &lt;- Gaspar_hits2$ID
+str(sign_genes_Wray)
 
-Gaspar &lt;- unique(sign_genes_Gaspar)
-length(Gaspar) #25 unique genes
-Wray &lt;- unique(sign_genes_Wray)
-length(Wray) #17 unique genes
-Us &lt;- unique(sign_genes_our)
-length(Us) #94 unique genes 
+Gaspar_hits2$ID &lt;- Gaspar_hits2$target
+Gaspar_hits2&lt;-Gaspar_hits2[!is.na(Gaspar_hits2$TWAS.Z),]
+sign_genes_Gaspar &lt;- Gaspar_hits2$ID
+str(sign_genes_Gaspar)
+
+sign_genes_Gerring &lt;- Gerring_hits_filt$ID
+
+Gaspar &lt;- unique(sign_genes_Gaspar) #25 unique genes
+Wray &lt;- unique(sign_genes_Wray) #17 unique genes
+Us &lt;- unique(sign_genes_our) #91 unique genes 
+Gerring &lt;- unique(sign_genes_Gerring) #57 unique genes
 
 #create a general variable with all sign. genes in any paper
-All &lt;- c(Gaspar, Wray, Us)
-length(All) #136 features
+All &lt;- c(Gaspar, Wray, Us, Gerring)
+All #190 genes - from any of the examined publications (i.e. there might still be some duplicates, across studies)
 
 #keep only unique gene IDs
 All_unique &lt;- unique(All)
-length(All_unique) #108 genes
+All_unique #133 unique genes considered as significant across all examined publications 
+
 
 ###
 #Keep only genes sign, in either of the three studies
 ###
 
 #filter by genes which are in the vector containing sign. features in any of the studies
-our_hits_final &lt;- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  
-dim(our_hits_final)[1] #675 observations
+our_hits_final &lt;- our_hits_filt[(our_hits_filt$ID %in% All_unique), ]  #817 observations
 
-#keep only unique genes in our study (those with the greatest absolute z-score)
+#keep only unique genes (those with the greatest absolute z-score)
+#to do so, after excluding for missing values, you order genes by z-scores (decreasing order) and keep only unique values
+#since you ordered from the largest z-scores, the genes with the largest z-scores will be kept and their duplicates, with lower
+# z-scores, discarded. 
 our_hits_final&lt;-our_hits_final[!is.na(our_hits_final$TWAS.Z),]
 our_hits_final2 &lt;- our_hits_final[order(abs(our_hits_final$TWAS.Z), decreasing = T), ]
 library(dplyr)
-our_hits_final3  &lt;- our_hits_final2 %&gt;% distinct(ID, .keep_all = T)
-dim(our_hits_final3)[1] #107 obs.
+our_hits_final3  &lt;- our_hits_final2 %&gt;% distinct(ID, .keep_all = T) #125 obs.
 
 our_hits_correct &lt;- our_hits_final3
 
-#keep only unique genes in the Gaspar et al study 
+#keep only unique genes in the Gaspar et al study (different snp-weight sets were tested)
 Gaspar_hits2b&lt;-Gaspar_hits2[!is.na(Gaspar_hits2$TWAS.Z),]
 Gaspar_hits3 &lt;- Gaspar_hits2b[order(abs(Gaspar_hits2b$TWAS.Z), decreasing = T), ]
-library(dplyr)
-Gaspar_hits4  &lt;- Gaspar_hits3 %&gt;% distinct(ID, .keep_all = T)
-dim(Gaspar_hits4)[1] #25 gene IDs 
+Gaspar_hits4  &lt;- Gaspar_hits3 %&gt;% distinct(target, .keep_all = T) #25 gene IDs, as expected 
 
 Gaspar_correct &lt;- Gaspar_hits4
 
@@ -13909,15 +13906,22 @@ Gaspar_correct &lt;- Gaspar_hits4
 Wray_hits_correct &lt;- Wray_hits_filt[!is.na(Wray_hits_filt$TWAS.Z), ] 
 Wray_hits_correct
 
+#keep only unique genes in the Gerring et al. study (different snp-weight sets were tested)
+Gerring_hits_filt2&lt;-Gerring_hits_filt[!is.na(Gerring_hits_filt$ZSTAT),]
+Gerring_hits_filt3 &lt;- Gerring_hits_filt2[order(abs(Gerring_hits_filt2$ZSTAT), decreasing = T), ]
+Gerring_correct &lt;- Gerring_hits_filt3 %&gt;% distinct(ID, .keep_all = T) #57 genes
+
 ###
 # Change the names of variables which have the same col name but distinct values across the three df
 ###
-
 Gaspar_correct$Gaspar_TWAS.Z &lt;- Gaspar_correct$TWAS.Z
 Gaspar_correct$TWAS.Z &lt;- NULL
 
 Wray_hits_correct$Wray_TWAS.Z &lt;- Wray_hits_correct$TWAS.Z
 Wray_hits_correct$TWAS.Z &lt;- NULL
+
+Gerring_correct$Gerring_TWAS.Z &lt;- Gerring_correct$ZSTAT
+Gerring_correct$ZSTAT &lt;- NULL
 
 Wray_hits_correct$Wray_TWAS.P &lt;- Wray_hits_correct$TWAS.P
 Wray_hits_correct$TWAS.P &lt;- NULL
@@ -13930,54 +13934,51 @@ our_hits_correct$TWAS.P &lt;- NULL
 our_hits_correct$PANEL &lt;- NULL
 our_hits_correct$PANEL_clean_short &lt;- NULL
 
+
 Wray_hits_correct$CHR &lt;- NULL
 Wray_hits_correct$Wray_TWAS.P &lt;- NULL
 Wray_hits_correct$TWAS.P &lt;- NULL
 
-Gaspar_correct$CHR &lt;- NULL
 Gaspar_correct$PANEL &lt;- NULL
+
 
 ###
 #join your hits with the hits from the wray et al. paper and Gaspar et al paper
 ###
 #since the three tibbles do not have the same nrow, we cannot use merge. But we can use full_join
 
-Gaspar_correct &lt;- as_tibble(Gaspar_correct) #transform all df into tibbles to use full join. the other two
+Gaspar_correct &lt;- as_tibble(Gaspar_correct) #transform all df into tibbles to use full join. the other 3
 ##df are already tibbles. this was the only one left to convert
 
+
 #join hits bw Gaspar and our study
-table_correct&lt;- full_join(our_hits_correct, Gaspar_correct)
-dim(table_correct)[1] # 108
+Gaspar_correct$ID &lt;- Gaspar_correct$target
+table_correct&lt;- full_join(our_hits_correct, Gaspar_correct) #dim 129, 10
 
 #merge the newly created table with the wray et al findings too
-table_correct2 &lt;- full_join(table_correct, Wray_hits_correct)  #dim 108, 8 
-dim(table_correct2)[1] # 108
+table_correct2 &lt;- full_join(table_correct, Wray_hits_correct)  #dim 129, 11
+
+#merge the newly created table with the Gerring et al. findings
+table_correct3 &lt;- full_join(table_correct2, Gerring_correct) #dim 133, 13
 
 #check that no gene is repeated and that z-scores are present for the three studies (should be high z-scores)
-table_correct2 &lt;- table_correct2[order(table_correct2$ID), ]
-table_correct2 #everything looks fine
+table_correct3 &lt;- table_correct3[order(table_correct3$ID), ]
 
-#delete the Dall&#39;Aglio TWAS.P col 
-table_correct2$DallAglio_TWAS.P &lt;- NULL
-
-#add a column saying whether the gene was transcriptome-wide sign. in our study 
-table_correct2$Transcriptome_wide_sign_DallAglio &lt;- ifelse(table_correct2$DallAglio_TWAS.Z &gt; 4.83 | table_correct2$DallAglio_TWAS.Z &lt; -4.83, &quot;Sign.&quot;, &quot;Not Sign.&quot;)
 
 ###
 # Clean up and save
 ###
 
-my_data &lt;- as_data_frame(table_correct2)
+my_data &lt;- as_data_frame(table_correct3)
 colnames(my_data)
 
-col_order &lt;- c(&quot;ID&quot;, &quot;Gaspar_TWAS.Z&quot;, &quot;Wray_TWAS.Z&quot;, &quot;DallAglio_TWAS.Z&quot;, &quot;Transcriptome_wide_sign_DallAglio&quot;)
+col_order &lt;- c(&quot;ID&quot;, &quot;Gaspar_TWAS.Z&quot;, &quot;Wray_TWAS.Z&quot;, &quot;Gerring_TWAS.Z&quot;, &quot;DallAglio_TWAS.Z&quot;, &quot;Transcriptome_wide_sign_DallAglio&quot;)
 my_data2 &lt;- my_data[, col_order]
 my_data2
 
 
 #save as csv file (each df col is treated as independent col, +excel format)
-write.csv(my_data2, &#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Previous_literature/comparison_previousTWASs.csv&#39;, row.names=F)
-my_data2</code></pre>
+write.csv(my_data2, &#39;C:/Users/loryd/Desktop/MSc dissertation/findings/table/comparison_previousTWASs.csv&#39;, row.names=F)</code></pre>
 </details>
 <details>
 <p><summary>Show comparison with previous TWAS</summary></p>
