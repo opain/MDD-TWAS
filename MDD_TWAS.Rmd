@@ -35,7 +35,7 @@ This documents an MDD TWAS study. The analysis was carried out by Lorenza Dall'A
 
 This study used GWAS summary statistics from the Wray et al Major Depression GWAS, including 23andMe participants. We used SNP-weights derived by FUSION for brain tissues, HPA tissues, HPT tissues, and blood. 
 
-After reviewer comments, we also included SNP-weights derived by the PsychENCODE team for the DLPFC. The PsychENCODE SNP-weights were derived using all HRC imputed variants within the PsychENCODE dataset. The standard FUSION LD reference is restricted to HapMap3 variants, so when using the PsychENCODE SNP-weight we used an unrestricted version of the 1KG Phase 3 reference to improve SNP overlap.
+We also included SNP-weights derived by the PsychENCODE team for the DLPFC. The PsychENCODE SNP-weights were derived using all HRC imputed variants within the PsychENCODE dataset. The standard FUSION LD reference is restricted to HapMap3 variants, so when using the PsychENCODE SNP-weight we used an unrestricted version of the 1KG Phase 3 reference to improve SNP overlap.
 
 ***
 
