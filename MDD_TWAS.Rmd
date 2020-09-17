@@ -310,8 +310,10 @@ length(unique(fusion[which(fusion$TWAS.P < 1.368572e-06),]$ID)) # 84 unique gene
 
 ***
 
-# Post-TWAS
+# Follow-up analyses
+
 ***
+
 ## Create Manahattan-style plots
 
 <details><summary>Show code</summary>
@@ -1151,7 +1153,7 @@ cp /users/k1806347/brc_scratch/Analyses/Lorenza/Clean/TWAS/MDD_TWAS.TWAS_Z_heatm
 
 Colocalisation identified whether TWAS and GWAS associations result from the same or distinct causal SNP.
 
-<details><summary>Organise coloc results</summary>
+<details><summary>Organise results</summary>
 ```{r, eval=F, echo=T}
 ###
 # Create a table with colocalisation results for all significant features
@@ -1408,6 +1410,10 @@ kable(res, rownames = FALSE, caption='MDD TWAS Brief Conditional Results', digit
 ```
 
 </details>
+
+***
+
+## Novel findings
 
 <details><summary>Show novelty table</summary>
 ```{R, echo=F, eval=T}
@@ -1712,6 +1718,10 @@ kable(res, rownames = FALSE, caption='MDD TWAS:TW-significant results with COLOC
 ```
 
 </details>
+
+*** 
+
+## High-confidence findings
 
 <details><summary>Show High-confidence associations results</summary>
 ```{R, echo=F, eval=T}

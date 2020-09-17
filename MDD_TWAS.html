@@ -793,8 +793,8 @@ length(unique(fusion[which(fusion$TWAS.P &lt; 1.368572e-06),]$ID)) # 84 unique g
 <hr />
 </div>
 </div>
-<div id="post-twas" class="section level1">
-<h1><span class="header-section-number">3</span> Post-TWAS</h1>
+<div id="follow-up-analyses" class="section level1">
+<h1><span class="header-section-number">3</span> Follow-up analyses</h1>
 <hr />
 <div id="create-manahattan-style-plots" class="section level2">
 <h2><span class="header-section-number">3.1</span> Create Manahattan-style plots</h2>
@@ -2942,7 +2942,7 @@ dev.off()
 <h2><span class="header-section-number">3.5</span> Process colocalisation results</h2>
 <p>Colocalisation identified whether TWAS and GWAS associations result from the same or distinct causal SNP.</p>
 <details>
-<p><summary>Organise coloc results</summary></p>
+<p><summary>Organise results</summary></p>
 <pre class="r"><code>###
 # Create a table with colocalisation results for all significant features
 ###
@@ -6510,6 +6510,10 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 </tbody>
 </table>
 </details>
+<hr />
+</div>
+<div id="novel-findings" class="section level2">
+<h2><span class="header-section-number">3.7</span> Novel findings</h2>
 <details>
 <p><summary>Show novelty table</summary></p>
 <table>
@@ -8647,7 +8651,7 @@ write.csv(gene_res,&#39;/users/k1806347/brc_scratch/Analyses/Lorenza/Clean/Condi
 <hr />
 </div>
 <div id="focus" class="section level2">
-<h2><span class="header-section-number">3.7</span> FOCUS</h2>
+<h2><span class="header-section-number">3.8</span> FOCUS</h2>
 <details>
 <p><summary>Merge the relevent FOCUS databases</summary></p>
 <pre class="bash"><code># Create a list of databases to be merged.
@@ -12824,6 +12828,10 @@ write.csv(fusion_focus_highConf,&#39;/users/k1806347/brc_scratch/Analyses/Lorenz
 </tbody>
 </table>
 </details>
+<hr />
+</div>
+<div id="high-confidence-findings" class="section level2">
+<h2><span class="header-section-number">3.9</span> High-confidence findings</h2>
 <details>
 <p><summary>Show High-confidence associations results</summary></p>
 <table>
@@ -12949,7 +12957,7 @@ write.csv(fusion_focus_highConf,&#39;/users/k1806347/brc_scratch/Analyses/Lorenz
 <hr />
 </div>
 <div id="twas-gsea" class="section level2">
-<h2><span class="header-section-number">3.8</span> TWAS-GSEA</h2>
+<h2><span class="header-section-number">3.10</span> TWAS-GSEA</h2>
 <details>
 <p><summary>Combine the predicted expression files for FUSION and PsychENCODE</summary></p>
 <pre class="r"><code>library(data.table)
